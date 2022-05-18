@@ -1,8 +1,8 @@
 # Gruppkontrakt 
 
 ### Roller:
-1. **Stakeholder** : Ronni
-2. **Scrum Master** : Markus
+1. **Stakeholder** : Hej	
+2. **Scrum Master** : hopp
 3. **Product Owner** : Hanna
 4. **Developers** : Jakob, Samir, Shenol, Natalie
 
