@@ -9,4 +9,4 @@
 -----
 Daily standups kl 10.00 - Tis - Tors - Fre!
 
-Vi ska skapa en discord bot som kollar närvaron för till exempel elever. 
+Vi ska skapa en discord bot som kollar nÃ¤rvaron fÃ¶r till exempel elever. 
