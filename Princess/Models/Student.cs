@@ -13,6 +13,6 @@
 
         public DateTime Date { get; set; }
 
-        public ICollection<Class> Classes { get; set; }
+        public ICollection<Class>? Classes { get; set; }
     }
 }
