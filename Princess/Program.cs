@@ -1,7 +1,10 @@
+using Princess.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<DbService>();
 
 var app = builder.Build();
 
@@ -21,7 +24,15 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var ctx = scope.ServiceProvider
+        .GetRequiredService<DbService>();
+
+    await ctx.EnsureCreated();
+}
 
 app.Run();
