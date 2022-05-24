@@ -1,3 +1,4 @@
+using Princess.Bot;
 using Microsoft.EntityFrameworkCore;
 using Princess.Data;
 
@@ -39,5 +40,7 @@ using (var scope = app.Services.CreateScope())
     ctx.Database.EnsureDeleted();
     ctx.Database.EnsureCreated();
 }
+var bot = new Bot();
+bot.RunAsync().GetAwaiter();
 
 app.Run();
