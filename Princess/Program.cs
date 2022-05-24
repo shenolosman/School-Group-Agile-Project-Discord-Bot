@@ -31,4 +31,13 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+using (var scope = app.Services.CreateScope())
+{
+    var ctx = scope.ServiceProvider
+        .GetRequiredService<PresenceDbContext>();
+
+    ctx.Database.EnsureDeleted();
+    ctx.Database.EnsureCreated();
+}
+
 app.Run();
