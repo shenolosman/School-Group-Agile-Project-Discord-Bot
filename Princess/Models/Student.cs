@@ -9,7 +9,7 @@
 
         public DateTime Date { get; set; }
 
-        public ICollection<Lecture> Lectures { get; set; }
+        public ICollection<Lecture>? Lectures { get; set; }
 
         public ICollection<Class>? Classes { get; set; }
     }

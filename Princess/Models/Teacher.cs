@@ -7,5 +7,6 @@
         public string Name { get; set; }
 
         public ICollection<Class>? Classes { get; set; }
+        public ICollection<Lecture>? Lectures { get; set; }
     }
 }
