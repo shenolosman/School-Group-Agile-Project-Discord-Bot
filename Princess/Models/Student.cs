@@ -7,12 +7,10 @@
 
         public string Name { get; set; }
 
-        public string? Response { get; set; }
-
         public bool Presence { get; set; }
 
         public string? ReasonAbsence { get; set; }
 
-        public Class? Class { get; set; }
+        public ICollection<Class> Classes { get; set; }
     }
 }
