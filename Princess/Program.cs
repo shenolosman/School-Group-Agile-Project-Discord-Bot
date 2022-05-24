@@ -1,3 +1,5 @@
+using Princess.Bot;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,5 +25,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+var bot = new Bot();
+bot.RunAsync().GetAwaiter();
 
 app.Run();
