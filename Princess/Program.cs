@@ -1,7 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Princess.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+var connectionString = "Server=(localdb)\\mssqllocaldb;Database=Pr3s3nc3Bot";
+builder.Services.AddDbContext<PresenceDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
