@@ -6,9 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var connectionString = "Server=(localdb)\\mssqllocaldb;Database=Pr3s3nc3Bot";
 builder.Services.AddDbContext<PresenceDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
