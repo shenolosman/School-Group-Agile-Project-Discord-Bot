@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Princess.Data;
 using Princess.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<DbService>();
+
+builder.Services.AddDbContext<PresenceDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
@@ -32,7 +38,8 @@ using (var scope = app.Services.CreateScope())
     var ctx = scope.ServiceProvider
         .GetRequiredService<DbService>();
 
-    await ctx.EnsureCreated();
+    if (app.Environment.IsProduction()) await ctx.EnsureCreated();
+    if (app.Environment.IsDevelopment()) await ctx.Recreate();
 }
 
 app.Run();
