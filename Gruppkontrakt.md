@@ -11,6 +11,9 @@ Daily standups kl 10.00 - Tis - Tors - Fre!
 
 Vi ska skapa en discord bot som kollar närvaron för till exempel elever. 
 
+- Branch Name: (numret på issuen) + namnet på issuen
+- Exempel på namn:  **33-set-up-bot**
+
 # Definition of Ready - DoR
 
 1. Oberoende – allt som behövs finns beskrivet i kortet/card
