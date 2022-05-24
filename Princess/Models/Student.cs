@@ -7,8 +7,6 @@
 
         public string Name { get; set; }
 
-        public DateTime Date { get; set; }
-
         public ICollection<Presence>? Presences { get; set; }
 
         public ICollection<Lecture>? Lectures { get; set; }
