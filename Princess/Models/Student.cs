@@ -7,11 +7,9 @@
 
         public string Name { get; set; }
 
-        public bool Presence { get; set; }
-
-        public string? ReasonAbsence { get; set; }
-
         public DateTime Date { get; set; }
+
+        public ICollection<Lecture> Lectures { get; set; }
 
         public ICollection<Class>? Classes { get; set; }
     }
