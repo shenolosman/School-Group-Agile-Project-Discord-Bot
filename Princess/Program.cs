@@ -1,9 +1,15 @@
 using Princess.Bot;
+using Microsoft.EntityFrameworkCore;
+using Princess.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<PresenceDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
@@ -26,6 +32,14 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+using (var scope = app.Services.CreateScope())
+{
+    var ctx = scope.ServiceProvider
+        .GetRequiredService<PresenceDbContext>();
+
+    ctx.Database.EnsureDeleted();
+    ctx.Database.EnsureCreated();
+}
 var bot = new Bot();
 bot.RunAsync().GetAwaiter();
 
