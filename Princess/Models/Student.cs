@@ -11,6 +11,8 @@
 
         public string? ReasonAbsence { get; set; }
 
+        public DateTime Date { get; set; }
+
         public ICollection<Class> Classes { get; set; }
     }
 }
