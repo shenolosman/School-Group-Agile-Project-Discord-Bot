@@ -1,5 +1,5 @@
-using Princess.Bot;
 using Microsoft.EntityFrameworkCore;
+using Princess.Bot;
 using Princess.Data;
 using Princess.Services;
 
@@ -39,9 +39,10 @@ using (var scope = app.Services.CreateScope())
     var ctx = scope.ServiceProvider
         .GetRequiredService<DbService>();
 
-    if (app.Environment.IsProduction()) await ctx.EnsureCreated();
-    if (app.Environment.IsDevelopment()) await ctx.Recreate();
+    if (app.Environment.IsProduction()) await ctx.IsCreatedAsync();
+    if (app.Environment.IsDevelopment()) await ctx.RecreateAsync();
 }
+
 var bot = new Bot();
 bot.RunAsync().GetAwaiter();
 

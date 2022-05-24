@@ -11,12 +11,12 @@ public class DbService
         _ctx = ctx;
     }
 
-    public async Task EnsureCreated()
+    public async Task IsCreatedAsync()
     {
         await _ctx.Database.EnsureCreatedAsync();
     }
 
-    public async Task Recreate()
+    public async Task RecreateAsync()
     {
         await _ctx.Database.EnsureDeletedAsync();
         await _ctx.Database.EnsureCreatedAsync();
