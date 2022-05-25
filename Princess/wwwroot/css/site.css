@@ -14,5 +14,75 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #32485C;
+    color: aliceblue
+}
+
+.bg-greenBlack {
+    background: rgb(50,72,92);
+    background: radial-gradient(circle, rgba(50, 72, 92, 1) 2%, rgba(212, 235, 216, 1) 88%) !important;
+}
+.nav-label {
+    font-size: 25px;
+    text-shadow: 1px 0 0 #374d60, -1px 0 0 #374d60, 0 -1px 0 #374d60, 1px 1px #374d60, -1px -1px 0 #374d60, 1px -1px 0 #374d60, -1px 1px 0 #374d60;
+    color: #d4ebd8 !important;
+}
+.nav-text {
+    color: #374d60 !important;
+}
+.navbar {
+    border: none !important;
+}
+.navbar-default .navbar-nav li a {
+    color: #374d60;
+}
+.footer-text {
+    color: aliceblue
+}
+.bg-table {
+    background-color: #374d60;
+    box-shadow: 2px 0 0 #cfe6d4, -2px 0 0 #cfe6d4, 0 -2px 0 #cfe6d4, 1px 1px #cfe6d4, -1px -1px 0 aliceblue, 1px -1px 0 #cfe6d4, -1px 1px 0 #cfe6d4;
+    color: aliceblue
+}
+.header-table {
+    border-collapse: collapse;
+    color: aliceblue;
+    font-size: 0.9em;
+    margin: 25px 0;
+}
+    .header-table thead tr {
+        text-align: left;
+        font-weight: bold;
+    }
+.ctx-table {
+    margin: 25px 0;
+}
+.ctx-table thead td {
+    text-align: left;
+    font-weight: bold;
+}
+.tdSize {
+    width: 20%;
+    text-align: left;
+    margin: auto;
+}
+#triangle {
+    background-color: #cfe6d4;
+    clip-path: polygon(0 100%, 100% 100%, 0 0);
+    width: 100%;
+    height: 100px;
+    text-decoration: none;
+}
+
+#triangleTwo {
+    background-color: #000000;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    width: 100%;
+    height: 80px;
+    text-decoration: none;
+}
+
+.background {
+    background-color: #374d60;
 }

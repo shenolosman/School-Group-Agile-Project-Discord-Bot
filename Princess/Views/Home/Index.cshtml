@@ -1,8 +1,78 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-}
+    ViewData["Header-title"] = "Pr3s3nc3 Overview";
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    var students = new List<Student>()
+    {
+        new Student()
+        {
+            Name = "Sanna",
+        },
+        new Student()
+        {
+            Name = "Sara",
+        },
+        new Student()
+        {
+            Name = "Jasmin",
+        },
+        new Student()
+        {
+            Name = "Hanna Hansson",
+        }
+    };
+
+    var presenceList = new List<Presence>()
+    {
+        new Presence()
+        {
+            Attended = true,
+            Student = students[0],
+        },
+        new Presence()
+        {
+            Attended = false, 
+            Student = students[1],
+        },
+        new Presence()
+        {
+            Attended = true, 
+            Student = students[3],
+        },
+        new Presence()
+        {
+            Attended = false, 
+            Student = students[2],
+        }
+    };
+}
+<br>
+<div class="d-flex ms-auto">
+    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
 </div>
+
+<table class="table header-table">
+<thead>
+<tr>
+    <th class="tdSize" scope="col">Class</th>
+    <th class="tdSize" scope="col">Teacher</th>
+    <th class="tdSize" scope="col">Time/Date</th>
+    <th class="tdSize" scope="col">Student</th>
+    <th class="tdSize" scope="col">Present</th>
+</tr>
+</thead>
+</table>
+@foreach (var student in presenceList)
+{
+    <table class="table bg-table ctx-table">
+        <tbody>
+        <tr>
+            <td class="tdSize" scope="row">Win21</td>
+            <td class="tdSize">Björn Strömberg</td>
+            <td class="tdSize"> @DateTime.Now.ToShortTimeString()</td>
+            <td class="tdSize">@student.Student.Name</td>
+            <td class="tdSize">@Html.CheckBoxFor(x => @student.Attended)</td>
+        </tr>
+        </tbody>
+    </table>
+}
