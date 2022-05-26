@@ -18,11 +18,12 @@ namespace Princess.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var date = DateTime.Today;
             //var model = await _handler.GetAllAbsenceAttendees();
-            //var model = await _handler.GetAllAttendees();
+            var model = await _handler.GetAllAttendees(date);
             //var model = await _handler.GetAllPresenceAttendees();
             //var model = await _handler.GetAbsenceAttendee("Ronni");
-            var model = await _handler.GetPresenceAttendee("Ronni");
+            // var model = await _handler.GetPresenceAttendee("Ronni");
             return View(model);
         }
 

@@ -13,9 +13,9 @@ public class PresenceHandler
         _ctx = ctx;
     }
 
-    public async Task<List<Presence>> GetAllAttendees()
+    public async Task<List<Presence>> GetAllAttendees(DateTime date)
     {
-        return await _ctx.Presences.Include(x => x.Student).ThenInclude(x => x.Lectures)!.ThenInclude(x => x.Class).ThenInclude(x => x.Teachers).ToListAsync();
+        return await _ctx.Presences.Include(x => x.Student).ThenInclude(x => x.Lectures)!.ThenInclude(x => x.Class).ThenInclude(x => x.Teachers).Where(x => x.Lecture.Date == date).ToListAsync();
     }
 
     public async Task<List<Presence>> GetAllPresenceAttendees()
@@ -27,7 +27,7 @@ public class PresenceHandler
     {
         return await _ctx.Presences.Include(x => x.Student).ThenInclude(x => x.Lectures)!.ThenInclude(x => x.Class).ThenInclude(x => x.Teachers).Where(x => !x.Attended).ToListAsync();
     }
-
+    //gonna make through date listing
     public async Task<List<Presence>> GetPresenceAttendee(string student)
     {
         return await _ctx.Presences.Include(x => x.Student).ThenInclude(x => x.Lectures)!.ThenInclude(x => x.Class)
