@@ -13,8 +13,8 @@ namespace Princess.Bot.Commands
         [Description("Gives a user teacher role, can only be used by owner/admin")]
         public async Task RegisterTeacher(CommandContext cmdCtx)
         {
-            //if (cmdCtx.Member.IsOwner || ((cmdCtx.Member.Permissions & Permissions.Administrator) != 0))
-            //{
+            if (cmdCtx.Member.IsOwner || ((cmdCtx.Member.Permissions & Permissions.Administrator) != 0))
+            {
 
                 var newTeacher = cmdCtx.Message.MentionedUsers.FirstOrDefault();
                 if (newTeacher == null)
@@ -93,7 +93,8 @@ namespace Princess.Bot.Commands
 
                 await cmdCtx.Message.Channel.SendMessageAsync(embed: newTeacherEmbed);
 
+            }
         }
-        }
-    //}
+    }
+          
 }
