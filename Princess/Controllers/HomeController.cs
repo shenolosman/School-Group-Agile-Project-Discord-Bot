@@ -19,8 +19,10 @@ namespace Princess.Controllers
         public async Task<IActionResult> Index()
         {
             var date = DateTime.Today;
+            var classsen = "Win21";
+            var teacher = "Björn";
             //var model = await _handler.GetAllAbsenceAttendees();
-            var model = await _handler.GetAllAttendees(date);
+            var model = await _handler.GetAllAbsenceAttendees(date, classsen, teacher);
             //var model = await _handler.GetAllPresenceAttendees();
             //var model = await _handler.GetAbsenceAttendee("Ronni");
             // var model = await _handler.GetPresenceAttendee("Ronni");
@@ -36,6 +38,15 @@ namespace Princess.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async Task<IActionResult> GetPresenceStudent()
+        {
+            var date = DateTime.Today;
+            var classsen = "Win21";
+            var teacher = "Björn";
+            var model = await _handler.GetAllPresenceAttendees(date, classsen, teacher);
+            return View(model);
         }
     }
 }
