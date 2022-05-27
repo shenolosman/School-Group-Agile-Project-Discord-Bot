@@ -63,7 +63,7 @@ body {
     font-weight: bold;
 }
 .tdSize {
-    width: 20%;
+    width: 16.6%;
     text-align: left;
     margin: auto;
 }
@@ -85,3 +85,7 @@ body {
         background-color: #e9ecef;
         border-color: #dee2e6;
     }
+input#student_Attended {
+    width: 23px;
+    height: 23px;
+}

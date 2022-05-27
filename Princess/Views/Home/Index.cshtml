@@ -20,6 +20,7 @@
             <th class="tdSize" scope="col">Date | Time</th>
             <th class="tdSize" scope="col">Student</th>
             <th class="tdSize" scope="col">Present</th>
+            <th class="tdSize" scope="col">Comment</th>
         </tr>
         </thead>
     </table>
@@ -32,8 +33,9 @@
                 <td class="tdSize">@student.Lecture.Teacher.Name</td>
                 <td class="tdSize">@student.Lecture.Date.ToShortDateString(), @student.Lecture.Date.ToShortTimeString()</td>
                 <td class="tdSize">@student.Student.Name</td>
-                <td class="tdSize">@Html.CheckBoxFor(x => @student.Attended, new {@disabled = "disabled"})</td>
-            </tr>
+                <td class="tdSize">@Html.CheckBoxFor(x => @student.Attended, new {@disabled = "disabled"} )</td>
+                <td class="tdSize">@student.ReasonAbsence</td>
+                </tr>
             </tbody>
         </table>
     }
