@@ -62,6 +62,7 @@ namespace Princess.Bot
 
             // Add Commands classes here for them to work
             Commands.RegisterCommands<GeneralCommands>();
+            Commands.RegisterCommands<AdminCommands>();
 
             await Client.ConnectAsync();
 
