@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -14,11 +15,45 @@ namespace Princess.Bot.Commands
         {
             var teacher = commandCtx.User;
 
-            // Do change in here to make changes on first message sent when AttendenCheck commando is ran.
+            var discordGuildRoles = commandCtx.Guild.Roles;
+
+            var guildRoles = discordGuildRoles.ToList();
+
+            bool studentRoleExists = false;
+            foreach (var role in guildRoles)
+            {
+                if (role.Value.Name.ToLower() == "student")
+                {
+                    studentRoleExists = true;
+                    break;
+                }
+
+            }
+
+            if (!studentRoleExists)
+            {
+                try
+                {
+                    // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
+                    await commandCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send presence check to all students in guild");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+            
+            discordGuildRoles = commandCtx.Guild.Roles;
+
+            var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
+
+            string mentionStudent = studentRole.Value.Mention;
+            // Do change in here to make changes on first message sent when AttendenceCheck commando is ran.
             var presenceEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
-                Description = $"This is a Presence-check. In the future there will be an question for you to answer here to see if you are present. But for now you only need to :+1:, to answer that you are present",
+                Description = $"{mentionStudent} - This is a Presence-check. In the future there will be an question for you to answer here to see if you are present. But for now you only need to :+1:, to answer that you are present",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = commandCtx.User.AvatarUrl,
