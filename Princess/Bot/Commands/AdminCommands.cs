@@ -10,13 +10,13 @@ namespace Princess.Bot.Commands
     public class AdminCommands : BaseCommandModule
     {
         [Command("RegisterTeacher")]
-        [Description("Gives a user teacher role, can only be used by owner/admin")]
-        public async Task RegisterTeacher(CommandContext cmdCtx)
+        [Description("Gives a user teacher role, can only be used by owner/admin. (The teacher role has admin privileges)")]
+        public async Task RegisterTeacher(CommandContext cmdCtx, [Description("The user to give teacher role to")] DiscordMember newTeacher)
         {
             if (cmdCtx.Member.IsOwner || ((cmdCtx.Member.Permissions & Permissions.Administrator) != 0))
             {
 
-                var newTeacher = cmdCtx.Message.MentionedUsers.FirstOrDefault();
+              
                 if (newTeacher == null)
                 {
                     var failedEmbed = new DiscordEmbedBuilder
@@ -39,45 +39,22 @@ namespace Princess.Bot.Commands
                     return;
                 }
 
+                await CreateTeacherRoleIfNotFoundAsync(cmdCtx);
+
+              
                 var serverRoles = cmdCtx.Guild.Roles;
-                bool serverHasTeacherRole = false;
-
-                foreach (var role in serverRoles)
-                {
-                    if (role.Value.Name == "Teacher")
-                    {
-                        serverHasTeacherRole = true;
-                    }
-                }
-
-                if (!serverHasTeacherRole)
-                {
-                    await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
-                        true);
-                }
-
-                DiscordMember newTeacherMember = null;
-
-                foreach (var member in cmdCtx.Guild.Members)
-                {
-                    if (member.Value.Id == newTeacher.Id)
-                    {
-                        newTeacherMember = member.Value;
-                    }
-                }
-                serverRoles = cmdCtx.Guild.Roles;
                 foreach (var role in serverRoles )
                 {
                     if (role.Value.Name == "Teacher")
                     {
-                        await newTeacherMember.GrantRoleAsync(role.Value);
+                        await newTeacher.GrantRoleAsync(role.Value);
                     }
                 }
 
                 var newTeacherEmbed = new DiscordEmbedBuilder
                 {
                     Title = "New Teacher!",
-                    Description = $"{newTeacherMember.Nickname} is now a teacher!",
+                    Description = $"{newTeacher.Nickname} is now a teacher!",
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         IconUrl = cmdCtx.User.AvatarUrl,
@@ -95,6 +72,31 @@ namespace Princess.Bot.Commands
 
             }
         }
+
+        public async Task CreateTeacherRoleIfNotFoundAsync(CommandContext cmdCtx)
+        {
+            var serverRoles = cmdCtx.Guild.Roles;
+            bool serverHasTeacherRole = false;
+
+            foreach (var role in serverRoles)
+            {
+                if (role.Value.Name == "Teacher")
+                {
+                    serverHasTeacherRole = true;
+                }
+            }
+
+            if (!serverHasTeacherRole)
+            {
+                await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
+                    true);
+            }
+
+
+            
+        }
+
+        
     }
           
 }
