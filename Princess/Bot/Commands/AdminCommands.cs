@@ -9,7 +9,7 @@ namespace Princess.Bot.Commands
 {
     public class AdminCommands : BaseCommandModule
     {
-        [Command("RegisterTeacher")]
+        [Command("Registerteacher")]
         [Description("Gives a user teacher role, can only be used by owner/admin. (The teacher role has admin privileges)")]
         public async Task RegisterTeacher(CommandContext cmdCtx, [Description("The user to give teacher role to")] DiscordMember newTeacher)
         {
