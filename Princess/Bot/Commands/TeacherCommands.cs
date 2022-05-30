@@ -2,8 +2,8 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
+using Princess.Models;
 
 namespace Princess.Bot.Commands
 {
@@ -11,10 +11,9 @@ namespace Princess.Bot.Commands
     {
         [Command("PresenceCheck")]
         [Description("Initiates an Presence-check")]
+        [RequireRoles(RoleCheckMode.Any, "Teacher")]
         public async Task AttedenceCheck(CommandContext commandCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
         {
-            var teacher = commandCtx.User;
-
             var discordGuildRoles = commandCtx.Guild.Roles;
 
             var guildRoles = discordGuildRoles.ToList();
@@ -27,7 +26,6 @@ namespace Princess.Bot.Commands
                     studentRoleExists = true;
                     break;
                 }
-
             }
 
             if (!studentRoleExists)
@@ -35,7 +33,7 @@ namespace Princess.Bot.Commands
                 try
                 {
                     // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
-                    await commandCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send presence check to all students in guild");
+                    await commandCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send a presence check to all students in guild");
                 }
                 catch (Exception e)
                 {
@@ -48,8 +46,14 @@ namespace Princess.Bot.Commands
 
             var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
 
-            string mentionStudent = studentRole.Value.Mention;
-            // Do change in here to make changes on first message sent when AttendenceCheck commando is ran.
+            string mentionStudent = "";
+
+            if (studentRole.Value != null)
+                mentionStudent = studentRole.Value.Mention;
+            else
+                mentionStudent = "Students";
+
+            // Do changes in here to make changes on first message sent when AttendenceCheck commando is ran.
             var presenceEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
@@ -84,7 +88,7 @@ namespace Princess.Bot.Commands
                 Color = DiscordColor.Gold,
             };
 
-            // Sends the embeded message from above
+            // Sends the embeded message from above in the channel the command was initiated.
             var presenceMessage = await commandCtx.Channel.SendMessageAsync(embed: presenceEmbed);
 
             foreach (var user in commandCtx.Channel.Users)
@@ -100,38 +104,17 @@ namespace Princess.Bot.Commands
                     throw;
                 }
             }
+
             // Creates an Discord-Emoji
-            
             var thumbsUpEmoji = DiscordEmoji.FromName(commandCtx.Client, ":+1:");
+
             // Puts the Discord-Emoji on the message
             await presenceMessage.CreateReactionAsync(thumbsUpEmoji);
-           
-
+            
             // This code makes it possible for messages to be reacted to, use interactivity to interact.
             var interactivity = commandCtx.Client.GetInteractivity();
-
-            // THIS IS THE CODE WHERE I TRIED TO MAKE IT POSSIBLE TO RESPOND WITH A MESSAGE/////////////////////////////////////////
-            //var responseList = new List<ulong>();
-            //var testResponse = new InteractivityResult<DiscordMessage>();
-            //try
-            //{
-            //    var response = await interactivity.WaitForMessageAsync(x => x.Channel == commandCtx.Channel && x == presenceMessage.);
-            //    testResponse = response;
-            //    responseList.Add(response.Result.Id);
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //    throw;
-            //}
-
-            //await commandCtx.Channel.SendMessageAsync($"User with id: {testResponse.Result.Id} responded to the presence check");
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+            
             var testResult = await interactivity.CollectReactionsAsync(presenceMessage, reactionDuration);
-
-            //var testResults = testResult.Select(x => $"{x.Emoji}");
 
             var allWhoThumbedUpUsernames = new List<string>();
             var allWhoThumbedUp = new List<DiscordUser>();
@@ -144,14 +127,18 @@ namespace Princess.Bot.Commands
                 {
                     foreach (var user in result.Users)
                     {
-                        if (user.Username == "Pr3s3nc3")
+                        if (user.IsBot)
                         {
                             totalThumbsUp--;
                         }
                         else
                         {
-                            totalThumbsUp++;
-                            allWhoThumbedUpUsernames.Add(user.Username);
+                            var member = commandCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            if (member != null)
+                            {
+                                totalThumbsUp++;
+                                allWhoThumbedUpUsernames.Add(member.Nickname ?? member.Username);
+                            }
                         }
                     }
                 }
@@ -174,12 +161,70 @@ namespace Princess.Bot.Commands
                 {
                     foreach (var user in result.Users)
                     {
-                        if (user.Username != "Pr3s3nc3")
+                        if (!user.IsBot)
                         {
                            allWhoThumbedUp.Add(user);
                         }
                     }
                 }
+            }
+            // TODO Save all variables needed to be sent into database, Make checks (is the teacher already registered in DB? Then dont create a new teacher just update, and so on)
+
+            // IMPORTANT, This is temporary, right now we dont do any checks if there is an class already made. Move students from the class to new lecture
+            // that is created. So we have a full list of students in lecture.
+            var schoolClass = new List<Class>()
+            {
+                new Class()
+                {
+                    Name = commandCtx.Guild.Name,
+                },
+            };
+
+            var teacher = new Teacher()
+            {
+                Id = commandCtx.User.Id,
+                Name = commandCtx.Member.Nickname ?? commandCtx.Member.Username,
+                Classes = schoolClass,
+            };
+
+
+            var students = new List<Student>()
+            {
+            };
+
+            foreach (var result in allWhoThumbedUp)
+            {
+                var member = commandCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == result.Id);
+                if (member != null)
+                {
+                    students.Add(new Student()
+                    {
+                        Id = result.Id,
+                        Name = member.Nickname ?? member.Username,
+                        Classes = schoolClass,
+                    });
+                }
+            }
+            var presences = new List<Presence>
+            {
+            };
+
+            var lecture = new Lecture()
+            {
+                Date = commandCtx.Message.CreationTimestamp.DateTime,
+                Class = schoolClass[0],
+                Teacher = teacher,
+                Students = students,
+            };
+
+            foreach (var student in students)
+            {
+                presences.Add(new Presence()
+                {
+                    Attended = true,
+                    Student = student,
+                    Lecture = lecture,
+                });
             }
         }
     }
