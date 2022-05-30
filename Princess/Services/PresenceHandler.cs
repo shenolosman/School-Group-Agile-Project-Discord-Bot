@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Princess.Data;
 using Princess.Models;
 
@@ -64,5 +64,16 @@ public class PresenceHandler
                                        (presence.Lecture.Date.Month < endDate.Month ||
                                         (presence.Lecture.Date.Month == endDate.Month &&
                                          presence.Lecture.Date.Day <= endDate.Day))).Where(x => x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
+    }
+    public async Task<List<Presence>> GetAttendanceList()
+    {
+        var attendanceList = await _ctx.Presences
+            .Include(x => x.Student)
+            .ThenInclude(x => x.Classes)
+            .ThenInclude(x => x.Lectures)
+            .ThenInclude(x => x.Teacher)
+            .ToListAsync();
+
+        return attendanceList;
     }
 }
