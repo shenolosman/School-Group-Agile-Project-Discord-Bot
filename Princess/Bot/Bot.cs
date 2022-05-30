@@ -6,6 +6,8 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using Newtonsoft.Json;
 using Princess.Bot.Commands;
+using Princess.Data;
+using Princess.Services;
 using TestBot;
 
 namespace Princess.Bot
@@ -15,7 +17,12 @@ namespace Princess.Bot
         public DiscordClient Client { get; private set; }
         public InteractivityExtension Interactivity { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
+        public IServiceProvider _Services { get; private set; }
 
+        public Bot(IServiceProvider services)
+        {
+            _Services = services;
+        }
         public async Task RunAsync()
         {
             var json = string.Empty;
@@ -55,7 +62,7 @@ namespace Princess.Bot
                 // Set CaseSensitive to true if we want to make commands case sensitive!
                 CaseSensitive = false,
 
-                //Services = true ---- Dependency injection???
+                Services = _Services
             };
 
             Commands = Client.UseCommandsNext(commandConfig);
@@ -64,7 +71,7 @@ namespace Princess.Bot
             Commands.RegisterCommands<GeneralCommands>();
 
             Commands.RegisterCommands<AdminCommands>();
-
+            
             Commands.RegisterCommands<TeacherCommands>();
 
 

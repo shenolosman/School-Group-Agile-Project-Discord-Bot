@@ -3,7 +3,9 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
+using Princess.Data;
 using Princess.Models;
+using Princess.Services;
 
 namespace Princess.Bot.Commands
 {
@@ -183,9 +185,8 @@ namespace Princess.Bot.Commands
 
             var teacher = new Teacher()
             {
-                Id = cmdCtx.User.Id,
                 Name = cmdCtx.Member.Nickname ?? cmdCtx.Member.Username,
-                Classes = schoolClass,
+                //Classes = schoolClass,
             };
 
             var students = new List<Student>()
@@ -225,6 +226,12 @@ namespace Princess.Bot.Commands
                     Student = student,
                     Lecture = lecture,
                 });
+            }
+
+            // In this scope you can use services, example: var variableName = scope.ServiceProvider.GetRequiredService<WhatEverServiceYouWant>();
+            await using (var scope = cmdCtx.Services.CreateAsyncScope())
+            {
+
             }
         }
     }
