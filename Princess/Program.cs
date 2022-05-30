@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
+using Princess.CSV;
 using Princess.Data;
 using Princess.Services;
 
@@ -43,8 +44,8 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsProduction()) await ctx.IsCreatedAsync();
     if (app.Environment.IsDevelopment()) await ctx.RecreateAsync();
 }
-
 var bot = new Bot();
 bot.RunAsync().GetAwaiter();
+var csvCreateFile = new CsvProgram();
 
 app.Run();
