@@ -12,7 +12,7 @@ public class DbService
         _ctx = ctx;
     }
 
-    async Task SeedAsync()
+    public async Task SeedAsync()
     {
 
         var classWin21 = new Class() { Name = "Win21", Teachers = new List<Teacher>() };
