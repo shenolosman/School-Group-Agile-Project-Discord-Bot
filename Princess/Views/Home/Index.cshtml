@@ -1,60 +1,8 @@
-﻿@using Microsoft.EntityFrameworkCore.Infrastructure
-@model List<Presence>
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
-    var presence = "Presence";
-    var absence = "Absence";
-    var date = DateTime.Today;
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
-
-<a class="btn btn-primary" asp-action="GetPresenceStudent">Get Presence student for today</a>
-<a class="btn btn-primary" asp-action="">Get Absence student for today</a>
-<select >
-    <option>win20</option>
-    <option>win21</option>
-</select>
-<label asp-for="@date" class="control-label"></label>
-<input asp-for="@date" class="control-label">
-<table class="table table-hover w-75">
-    <thead>
-        <tr>
-            <th>Class</th>
-            <th>Teacher</th>
-            <th>Date</th>
-            <th>Student</th>
-            <th>Presence</th>
-            <th>Reason of presence</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Lecture.Class.Name</td>
-                <td>@item.Lecture.Teacher.Name</td>
-                <td>@item.Lecture.Date</td>
-                <td>@item.Student.Name</td>
-           @*     <td>
-                    <input disabled="disabled" value="@item.Attended" asp-for="@item.Attended" />
-                </td>*@
-                @{
-                    if (@item.Attended == true)
-                    {
-                        <td>@presence</td>
-                    }
-                    else if (@item.Attended == false)
-                    {
-                        <td>@absence</td>
-                    }
-                }
-                <td>@item.ReasonAbsence</td>
-            </tr>
-        }
-    </tbody>
-</table>
-

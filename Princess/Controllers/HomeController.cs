@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Princess.Models;
-using Princess.Services;
 using System.Diagnostics;
 
 namespace Princess.Controllers
@@ -8,25 +7,15 @@ namespace Princess.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly PresenceHandler _handler;
 
-        public HomeController(ILogger<HomeController> logger, PresenceHandler handler)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _handler = handler;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var date = DateTime.Today;
-            var classsen = "Win21";
-            var teacher = "Björn";
-            //var model = await _handler.GetAllAbsenceAttendees();
-            var model = await _handler.GetAllAbsenceAttendees(date, classsen, teacher);
-            //var model = await _handler.GetAllPresenceAttendees();
-            //var model = await _handler.GetAbsenceAttendee("Ronni");
-            // var model = await _handler.GetPresenceAttendee("Ronni");
-            return View(model);
+            return View();
         }
 
         public IActionResult Privacy()
@@ -38,15 +27,6 @@ namespace Princess.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        public async Task<IActionResult> GetPresenceStudent()
-        {
-            var date = DateTime.Today;
-            var classsen = "Win21";
-            var teacher = "Björn";
-            var model = await _handler.GetAllPresenceAttendees(date, classsen, teacher);
-            return View(model);
         }
     }
 }
