@@ -12,7 +12,7 @@ public class DbService
         _ctx = ctx;
     }
 
-    async Task SeedAsync()
+    public async Task SeedAsync()
     {
 
         var classWin21 = new Class() { Name = "Win21", Teachers = new List<Teacher>() };
@@ -50,6 +50,11 @@ public class DbService
             new Lecture{Date = DateTime.Today.AddDays(-1),Class = classWin20,Teacher = teacher[1]},
             new Lecture{Date = DateTime.Today.AddDays(-30),Class =classWin21,Teacher = teacher[0]},
             new Lecture{Date = DateTime.Today.AddDays(-60),Class = classWin20,Teacher = teacher[1]},
+            new Lecture{Date = DateTime.Today.AddDays(-2),Class =classWin21,Teacher = teacher[0]},
+            new Lecture{Date = DateTime.Today.AddDays(-3),Class =classWin21,Teacher = teacher[0]},
+            new Lecture{Date = DateTime.Today.AddDays(-4),Class =classWin21,Teacher = teacher[0]},
+            new Lecture{Date = DateTime.Today.AddDays(-5),Class =classWin21,Teacher = teacher[0]},
+            new Lecture{Date = DateTime.Today.AddDays(-6),Class =classWin21,Teacher = teacher[0]},
         };
 
         var presencesForToday = new List<Presence>
@@ -81,15 +86,65 @@ public class DbService
             new Presence() { Attended = false, Student = studentsClass2[4],Lecture = lectures[2],ReasonAbsence = null},
         };
 
-        var presencesLast2Month = new List<Presence>()
+        var presencesLast2Month = new List<Presence>
         {
             new Presence() { Attended = true, Student = students[0],Lecture = lectures[3],ReasonAbsence = null},
             new Presence() { Attended = true, Student = students[1],Lecture = lectures[3],ReasonAbsence = null},
             new Presence() { Attended = true, Student = students[2],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[3],Lecture = lectures[3],ReasonAbsence = null},
+            new Presence() { Attended = false, Student = students[3],Lecture = lectures[3],ReasonAbsence = null},
             new Presence() { Attended = true, Student = students[4],Lecture = lectures[3],ReasonAbsence = null},
             new Presence() { Attended = true, Student = students[5],Lecture = lectures[3],ReasonAbsence = null},
             new Presence() { Attended = true, Student = students[6],Lecture = lectures[3],ReasonAbsence = null},
+        };
+        var presencesLastDay = new List<Presence>()
+        {
+            new Presence() { Attended = true, Student = students[0],Lecture = lectures[4],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[1],Lecture = lectures[4],ReasonAbsence = null},
+            new Presence() { Attended = false, Student = students[2],Lecture = lectures[4],ReasonAbsence = "reason 3"},
+            new Presence() { Attended = false, Student = students[3],Lecture = lectures[4],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[4],Lecture = lectures[4],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[5],Lecture = lectures[4],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[6],Lecture = lectures[4],ReasonAbsence = null},
+        };
+        var presencesLast3Day = new List<Presence>()
+        {
+            new Presence() { Attended = true, Student = students[0],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[1],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[2],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[3],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[4],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[5],Lecture = lectures[5],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[6],Lecture = lectures[5],ReasonAbsence = null},
+        };
+        var presencesLast4Day = new List<Presence>()
+        {
+            new Presence() { Attended = true, Student = students[0],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[1],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[2],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[3],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[4],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[5],Lecture = lectures[6],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[6],Lecture = lectures[6],ReasonAbsence = null},
+        };
+        var presencesLast5Day = new List<Presence>()
+        {
+            new Presence() { Attended = false, Student = students[0],Lecture = lectures[7],ReasonAbsence = "No reason"},
+            new Presence() { Attended = false, Student = students[1],Lecture = lectures[7],ReasonAbsence = "No reason"},
+            new Presence() { Attended = true, Student = students[2],Lecture = lectures[7],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[3],Lecture = lectures[7],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[4],Lecture = lectures[7],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[5],Lecture = lectures[7],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[6],Lecture = lectures[7],ReasonAbsence = null},
+        };
+        var presencesLast6Day = new List<Presence>()
+        {
+            new Presence() { Attended = true, Student = students[0],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[1],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[2],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[3],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[4],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[5],Lecture = lectures[8],ReasonAbsence = null},
+            new Presence() { Attended = true, Student = students[6],Lecture = lectures[8],ReasonAbsence = null},
         };
 
         classWin21.Students = students;
@@ -112,6 +167,11 @@ public class DbService
         await _ctx.AddRangeAsync(presencesForYesterday);
         await _ctx.AddRangeAsync(presencesLastMonth);
         await _ctx.AddRangeAsync(presencesLast2Month);
+        await _ctx.AddRangeAsync(presencesLastDay);
+        await _ctx.AddRangeAsync(presencesLast3Day);
+        await _ctx.AddRangeAsync(presencesLast4Day);
+        await _ctx.AddRangeAsync(presencesLast5Day);
+        await _ctx.AddRangeAsync(presencesLast6Day);
 
         await _ctx.SaveChangesAsync();
     }
