@@ -10,11 +10,11 @@ namespace Princess.Bot.Commands
     public class TeacherCommands : BaseCommandModule
     {
         [Command("PresenceCheck")]
-        [Description("Initiates an Presence-check")]
+        [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
-        public async Task AttedenceCheck(CommandContext commandCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
+        public async Task AttedenceCheck(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
         {
-            var discordGuildRoles = commandCtx.Guild.Roles;
+            var discordGuildRoles = cmdCtx.Guild.Roles;
 
             var guildRoles = discordGuildRoles.ToList();
 
@@ -33,7 +33,7 @@ namespace Princess.Bot.Commands
                 try
                 {
                     // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
-                    await commandCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send a presence check to all students in guild");
+                    await cmdCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send a presence check to all students in guild");
                 }
                 catch (Exception e)
                 {
@@ -42,7 +42,7 @@ namespace Princess.Bot.Commands
                 }
             }
             
-            discordGuildRoles = commandCtx.Guild.Roles;
+            discordGuildRoles = cmdCtx.Guild.Roles;
 
             var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
 
@@ -53,20 +53,20 @@ namespace Princess.Bot.Commands
             else
                 mentionStudent = "Students";
 
-            // Do changes in here to make changes on first message sent when AttendenceCheck commando is ran.
+            // Do changes in here to make changes on first message sent when AttendenceCheck command is ran.
             var presenceEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
                 Description = $"{mentionStudent} - This is a Presence-check. In the future there will be an question for you to answer here to see if you are present. But for now you only need to :+1:, to answer that you are present",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    IconUrl = commandCtx.User.AvatarUrl,
-                    Name = commandCtx.User.Username,
+                    IconUrl = cmdCtx.User.AvatarUrl,
+                    Name = cmdCtx.User.Username,
                 },
 
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
                 {
-                   Url = commandCtx.Client.CurrentUser.AvatarUrl
+                   Url = cmdCtx.Client.CurrentUser.AvatarUrl
                 },
                 Color = DiscordColor.Gold,
             };
@@ -74,24 +74,25 @@ namespace Princess.Bot.Commands
             var dmEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
-                Description = $"Your teacher in \"{commandCtx.Guild.Name}\" has made an presence-check in the <#{commandCtx.Channel.Id}> channel. You have 15 minutes to thumb up that message, otherwise you will be set as absent to that lecture",
+                Description = $"Your teacher in \"{cmdCtx.Guild.Name}\" has made an presence-check in the <#{cmdCtx.Channel.Id}> channel. You have 15 minutes to thumb up that message, otherwise you will be set as absent to that lecture",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    IconUrl = commandCtx.User.AvatarUrl,
-                    Name = commandCtx.User.Username,
+                    IconUrl = cmdCtx.User.AvatarUrl,
+                    Name = cmdCtx.User.Username,
                 },
 
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
                 {
-                    Url = commandCtx.Client.CurrentUser.AvatarUrl
+                    Url = cmdCtx.Client.CurrentUser.AvatarUrl
                 },
                 Color = DiscordColor.Gold,
             };
 
             // Sends the embeded message from above in the channel the command was initiated.
-            var presenceMessage = await commandCtx.Channel.SendMessageAsync(embed: presenceEmbed);
+            var presenceMessage = await cmdCtx.Channel.SendMessageAsync(embed: presenceEmbed);
 
-            foreach (var user in commandCtx.Channel.Users)
+            // This is the part where all who is active on channel gets a DM that an presence-check is started. Doesnt work as intented yet.
+            foreach (var user in cmdCtx.Channel.Users)
             {
                 try
                 {
@@ -106,13 +107,13 @@ namespace Princess.Bot.Commands
             }
 
             // Creates an Discord-Emoji
-            var thumbsUpEmoji = DiscordEmoji.FromName(commandCtx.Client, ":+1:");
+            var thumbsUpEmoji = DiscordEmoji.FromName(cmdCtx.Client, ":+1:");
 
             // Puts the Discord-Emoji on the message
             await presenceMessage.CreateReactionAsync(thumbsUpEmoji);
             
             // This code makes it possible for messages to be reacted to, use interactivity to interact.
-            var interactivity = commandCtx.Client.GetInteractivity();
+            var interactivity = cmdCtx.Client.GetInteractivity();
             
             var testResult = await interactivity.CollectReactionsAsync(presenceMessage, reactionDuration);
 
@@ -133,7 +134,7 @@ namespace Princess.Bot.Commands
                         }
                         else
                         {
-                            var member = commandCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
                             if (member != null)
                             {
                                 totalThumbsUp++;
@@ -146,13 +147,13 @@ namespace Princess.Bot.Commands
 
             if (totalThumbsUp > 0)
             {
-                await commandCtx.Channel.SendMessageAsync($"Here is a list of how many and who was present");
-                await commandCtx.Channel.SendMessageAsync($":+1:: {totalThumbsUp}");
-                await commandCtx.Channel.SendMessageAsync(string.Join("\n", allWhoThumbedUpUsernames));
+                await cmdCtx.Channel.SendMessageAsync($"Here is a list of how many and who was present");
+                await cmdCtx.Channel.SendMessageAsync($":+1:: {totalThumbsUp}");
+                await cmdCtx.Channel.SendMessageAsync(string.Join("\n", allWhoThumbedUpUsernames));
             }
             else
             {
-                await commandCtx.Channel.SendMessageAsync($"None was present, no :+1::s today :slight_frown:");
+                await cmdCtx.Channel.SendMessageAsync($"None was present, no :+1::s today :slight_frown:");
             }
 
             foreach (var result in testResult)
@@ -170,20 +171,20 @@ namespace Princess.Bot.Commands
             }
             // TODO Save all variables needed to be sent into database, Make checks (is the teacher already registered in DB? Then dont create a new teacher just update, and so on)
 
-            // IMPORTANT, This is temporary, right now we dont do any checks if there is an class already made. Move students from the class to new lecture
-            // that is created. So we have a full list of students in lecture.
+            // IMPORTANT, schoolClass is and should be temporary, right now we dont do any checks if there is an class already made. Move students from the class in db to new lecture
+            // that is created. So we have a full list of students in lecture. Otherwise there will be only those who where present.
             var schoolClass = new List<Class>()
             {
                 new Class()
                 {
-                    Name = commandCtx.Guild.Name,
+                    Name = cmdCtx.Guild.Name,
                 },
             };
 
             var teacher = new Teacher()
             {
-                Id = commandCtx.User.Id,
-                Name = commandCtx.Member.Nickname ?? commandCtx.Member.Username,
+                Id = cmdCtx.User.Id,
+                Name = cmdCtx.Member.Nickname ?? cmdCtx.Member.Username,
                 Classes = schoolClass,
             };
 
@@ -194,7 +195,7 @@ namespace Princess.Bot.Commands
 
             foreach (var result in allWhoThumbedUp)
             {
-                var member = commandCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == result.Id);
+                var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == result.Id);
                 if (member != null)
                 {
                     students.Add(new Student()
@@ -211,7 +212,7 @@ namespace Princess.Bot.Commands
 
             var lecture = new Lecture()
             {
-                Date = commandCtx.Message.CreationTimestamp.DateTime,
+                Date = cmdCtx.Message.CreationTimestamp.DateTime,
                 Class = schoolClass[0],
                 Teacher = teacher,
                 Students = students,
