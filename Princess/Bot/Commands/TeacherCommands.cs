@@ -12,7 +12,7 @@ namespace Princess.Bot.Commands
         [Command("PresenceCheck")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
-        public async Task AttedenceCheck(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
+        public async Task PresenceCheck(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
         {
             var discordGuildRoles = cmdCtx.Guild.Roles;
 
@@ -187,7 +187,6 @@ namespace Princess.Bot.Commands
                 Name = cmdCtx.Member.Nickname ?? cmdCtx.Member.Username,
                 Classes = schoolClass,
             };
-
 
             var students = new List<Student>()
             {
