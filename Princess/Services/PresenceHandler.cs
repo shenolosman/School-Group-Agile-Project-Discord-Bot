@@ -13,6 +13,7 @@ public class PresenceHandler
         _ctx = ctx;
     }
 
+
     public async Task<List<Presence>> GetAllAttendees(DateTime date, string selectedClass, string selectedTeacher)
     {
         return await _ctx.Presences
@@ -76,4 +77,5 @@ public class PresenceHandler
 
         return attendanceList;
     }
+
 }
