@@ -49,7 +49,7 @@ namespace Princess.Bot
             var commandConfig = new CommandsNextConfiguration
             {
                 StringPrefixes = new string[] { configJson.Prefix },
-                EnableDms = false,
+                EnableDms = true,
                 EnableMentionPrefix = true,
                 DmHelp = true,
                 // Set CaseSensitive to true if we want to make commands case sensitive!
@@ -62,6 +62,7 @@ namespace Princess.Bot
 
             // Add Commands classes here for them to work
             Commands.RegisterCommands<GeneralCommands>();
+            Commands.RegisterCommands<TeacherCommands>();
 
             await Client.ConnectAsync();
 
