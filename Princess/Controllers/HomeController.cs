@@ -19,7 +19,7 @@ namespace Princess.Controllers
             var maxRowsPerPage = 10;
             var attendanceModel = new AttendanceView();
 
-            var getAttendanceList = await _presenceHandler.GetAttendanceList();
+            var getAttendanceList = await _presenceHandler.GetAllAttendees(DateTime.Today, "Win21", "Björn");
 
             attendanceModel.AttendanceList = (from student in getAttendanceList select student)
                 .OrderBy(x => x.Student.Name)
