@@ -14,137 +14,142 @@ public class DbService
 
     public async Task SeedAsync()
     {
+        var classWin21 = new Class {Name = "Win21", Teachers = new List<Teacher>()};
+        var classWin20 = new Class {Name = "Win20", Teachers = new List<Teacher>()};
 
-        var classWin21 = new Class() { Name = "Win21", Teachers = new List<Teacher>() };
-        var classWin20 = new Class() { Name = "Win20", Teachers = new List<Teacher>() };
-
-        var teacher = new List<Teacher>()
+        var teacher = new List<Teacher>
         {
-            new Teacher(){Name = "Björn"},
-            new Teacher(){Name = "Pernilla"}
+            new() {Name = "Björn"},
+            new() {Name = "Pernilla"}
         };
 
-        var students = new List<Student>()
+        var students = new List<Student>
         {
-            new Student() { Name = "Shenol"},
-            new Student() { Name = "Markus" },
-            new Student() { Name = "Ronni" },
-            new Student() { Name = "Hanna" },
-            new Student() { Name = "Natalie" },
-            new Student() { Name = "Jakob" },
-            new Student() { Name = "Samir" },
+            new() {Name = "Shenol"},
+            new() {Name = "Markus"},
+            new() {Name = "Ronni"},
+            new() {Name = "Hanna"},
+            new() {Name = "Natalie"},
+            new() {Name = "Jakob"},
+            new() {Name = "Samir"}
         };
 
         var studentsClass2 = new List<Student>
         {
-            new Student() { Name = "Sheki"},
-            new Student() { Name = "Herman" },
-            new Student() { Name = "Andreas" },
-            new Student() { Name = "Dennis" },
-            new Student() { Name = "Viktor" }
+            new() {Name = "Sheki"},
+            new() {Name = "Herman"},
+            new() {Name = "Andreas"},
+            new() {Name = "Dennis"},
+            new() {Name = "Viktor"}
         };
 
         var lectures = new List<Lecture>
         {
-            new Lecture{Date = DateTime.Today,Class = classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-1),Class = classWin20,Teacher = teacher[1]},
-            new Lecture{Date = DateTime.Today.AddDays(-30),Class =classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-60),Class = classWin20,Teacher = teacher[1]},
-            new Lecture{Date = DateTime.Today.AddDays(-2),Class =classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-3),Class =classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-4),Class =classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-5),Class =classWin21,Teacher = teacher[0]},
-            new Lecture{Date = DateTime.Today.AddDays(-6),Class =classWin21,Teacher = teacher[0]},
+            new() {Date = DateTime.Today, Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-1), Class = classWin20, Teacher = teacher[1]},
+            new() {Date = DateTime.Today.AddDays(-30), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-60), Class = classWin20, Teacher = teacher[1]},
+            new() {Date = DateTime.Today.AddDays(-2), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-3), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-4), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-5), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today.AddDays(-6), Class = classWin21, Teacher = teacher[0]}
         };
 
         var presencesForToday = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[0],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[0],ReasonAbsence = null},
-            new Presence() { Attended = false, Student = students[2],Lecture = lectures[0],ReasonAbsence = "reason 1"},
-            new Presence() { Attended = false, Student = students[3],Lecture = lectures[0],ReasonAbsence = "reason 2"},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[0],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[0],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[0],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = false, Student = students[2], Lecture = lectures[0], ReasonAbsence = "reason 1"},
+            new() {Attended = false, Student = students[3], Lecture = lectures[0], ReasonAbsence = "reason 2"},
+            new() {Attended = false, Student = students[4], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[0], ReasonAbsence = null}
         };
 
         var presencesForYesterday = new List<Presence>
         {
-            new Presence() { Attended = true, Student = studentsClass2[0],Lecture = lectures[1],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = studentsClass2[1],Lecture = lectures[1],ReasonAbsence = null},
-            new Presence() { Attended = false, Student = studentsClass2[2],Lecture = lectures[1],ReasonAbsence = "reason new 1"},
-            new Presence() { Attended = false, Student = studentsClass2[3],Lecture = lectures[1],ReasonAbsence = "reason new 2"},
-            new Presence() { Attended = false, Student = studentsClass2[4],Lecture = lectures[1],ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[0], Lecture = lectures[1], ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[1], Lecture = lectures[1], ReasonAbsence = null},
+            new()
+            {
+                Attended = false, Student = studentsClass2[2], Lecture = lectures[1], ReasonAbsence = "reason new 1"
+            },
+            new()
+            {
+                Attended = false, Student = studentsClass2[3], Lecture = lectures[1], ReasonAbsence = "reason new 2"
+            },
+            new() {Attended = false, Student = studentsClass2[4], Lecture = lectures[1], ReasonAbsence = null}
         };
 
-        var presencesLastMonth = new List<Presence>()
+        var presencesLastMonth = new List<Presence>
         {
-            new Presence() { Attended = true, Student = studentsClass2[0],Lecture = lectures[2],ReasonAbsence =null},
-            new Presence() { Attended = true, Student = studentsClass2[1],Lecture = lectures[2],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = studentsClass2[2],Lecture = lectures[2],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = studentsClass2[3],Lecture = lectures[2],ReasonAbsence = null},
-            new Presence() { Attended = false, Student = studentsClass2[4],Lecture = lectures[2],ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[0], Lecture = lectures[2], ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[1], Lecture = lectures[2], ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[2], Lecture = lectures[2], ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[3], Lecture = lectures[2], ReasonAbsence = null},
+            new() {Attended = false, Student = studentsClass2[4], Lecture = lectures[2], ReasonAbsence = null}
         };
 
         var presencesLast2Month = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[2],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = false, Student = students[3],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[3],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[3],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = true, Student = students[2], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = false, Student = students[3], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[3], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[3], ReasonAbsence = null}
         };
-        var presencesLastDay = new List<Presence>()
+        var presencesLastDay = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[4],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[4],ReasonAbsence = null},
-            new Presence() { Attended = false, Student = students[2],Lecture = lectures[4],ReasonAbsence = "reason 3"},
-            new Presence() { Attended = false, Student = students[3],Lecture = lectures[4],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[4],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[4],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[4],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[4], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[4], ReasonAbsence = null},
+            new() {Attended = false, Student = students[2], Lecture = lectures[4], ReasonAbsence = "reason 3"},
+            new() {Attended = false, Student = students[3], Lecture = lectures[4], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[4], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[4], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[4], ReasonAbsence = null}
         };
-        var presencesLast3Day = new List<Presence>()
+        var presencesLast3Day = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[2],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[3],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[5],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[5],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[2], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[3], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[5], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[5], ReasonAbsence = null}
         };
-        var presencesLast4Day = new List<Presence>()
+        var presencesLast4Day = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[2],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[3],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[6],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[6],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[2], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[3], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[6], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[6], ReasonAbsence = null}
         };
-        var presencesLast5Day = new List<Presence>()
+        var presencesLast5Day = new List<Presence>
         {
-            new Presence() { Attended = false, Student = students[0],Lecture = lectures[7],ReasonAbsence = "No reason"},
-            new Presence() { Attended = false, Student = students[1],Lecture = lectures[7],ReasonAbsence = "No reason"},
-            new Presence() { Attended = true, Student = students[2],Lecture = lectures[7],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[3],Lecture = lectures[7],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[7],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[7],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[7],ReasonAbsence = null},
+            new() {Attended = false, Student = students[0], Lecture = lectures[7], ReasonAbsence = "No reason"},
+            new() {Attended = false, Student = students[1], Lecture = lectures[7], ReasonAbsence = "No reason"},
+            new() {Attended = true, Student = students[2], Lecture = lectures[7], ReasonAbsence = null},
+            new() {Attended = true, Student = students[3], Lecture = lectures[7], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[7], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[7], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[7], ReasonAbsence = null}
         };
-        var presencesLast6Day = new List<Presence>()
+        var presencesLast6Day = new List<Presence>
         {
-            new Presence() { Attended = true, Student = students[0],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[1],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[2],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[3],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[4],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[5],Lecture = lectures[8],ReasonAbsence = null},
-            new Presence() { Attended = true, Student = students[6],Lecture = lectures[8],ReasonAbsence = null},
+            new() {Attended = true, Student = students[0], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[1], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[2], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[3], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[4], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[5], Lecture = lectures[8], ReasonAbsence = null},
+            new() {Attended = true, Student = students[6], Lecture = lectures[8], ReasonAbsence = null}
         };
 
         classWin21.Students = students;
@@ -175,6 +180,7 @@ public class DbService
 
         await _ctx.SaveChangesAsync();
     }
+
     public async Task IsCreatedAsync()
     {
         await _ctx.Database.EnsureCreatedAsync();

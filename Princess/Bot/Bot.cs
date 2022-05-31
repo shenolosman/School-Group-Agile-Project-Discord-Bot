@@ -7,26 +7,26 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Newtonsoft.Json;
 using Princess.Bot.Commands;
-using Princess.Data;
-using Princess.Services;
 using TestBot;
 
-namespace Princess.Bot
-{
-    public class Bot
-    {
-        public DiscordClient Client { get; private set; }
-        public InteractivityExtension Interactivity { get; private set; }
-        public CommandsNextExtension Commands { get; private set; }
-        public IServiceProvider _Services { get; private set; }
+namespace Princess.Bot;
 
-        public Bot(IServiceProvider services)
-        {
-            _Services = services;
-        }
-        public async Task RunAsync()
-        {
-            var json = string.Empty;
+public class Bot
+{
+    public Bot(IServiceProvider services)
+    {
+        _Services = services;
+    }
+
+
+    public DiscordClient Client { get; private set; }
+    public InteractivityExtension Interactivity { get; private set; }
+    public CommandsNextExtension Commands { get; private set; }
+    public IServiceProvider _Services { get; }
+
+    public async Task RunAsync()
+    {
+        var json = string.Empty;
 
         using (var fs = File.OpenRead("BotConfig.json"))
         using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
@@ -63,22 +63,20 @@ namespace Princess.Bot
             EnableMentionPrefix = true,
             DmHelp = true,
             // Set CaseSensitive to true if we want to make commands case sensitive!
-            CaseSensitive = false
+            CaseSensitive = false,
 
-                Services = _Services
-            };
+            Services = _Services
+        };
 
         Commands = Client.UseCommandsNext(commandConfig);
 
         // Add Commands classes here for them to work
         Commands.RegisterCommands<GeneralCommands>();
 
-            Commands.RegisterCommands<AdminCommands>();
-            
-            Commands.RegisterCommands<TeacherCommands>();
         Commands.RegisterCommands<AdminCommands>();
 
         Commands.RegisterCommands<TeacherCommands>();
+
         Commands.RegisterCommands<StudentCommands>();
 
 

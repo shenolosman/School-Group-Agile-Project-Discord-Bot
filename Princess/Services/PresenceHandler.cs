@@ -89,39 +89,38 @@ public class PresenceHandler
         return attendanceList;
     }
 
-    public async Task RegisterAbsenceForStudent(ulong studentId, string channel, DateTime date)
+    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong channel, DateTime date)
     {
         var message = "Registered absence";
 
         var student = _ctx.Students
             .Where(x => x.Id == studentId)
-            .First();
+            .FirstOrDefault();
 
         var classget = _ctx.Classes
-            .Where(x => x.Name == channel)
-            .First();
+            .Where(x => x.Id == channel)
+            .FirstOrDefault();
 
         var lecture = _ctx.Lectures
             .Where(x => x.Class == classget && x.Date == date)
-            .First();
+            .FirstOrDefault();
 
-        var presence = new Presence
+        if (lecture != null && student != null && classget != null)
         {
-            Attended = false,
-            ReasonAbsence = message,
-            Student = student,
-            Lecture = lecture
-        };
+            var presence = new Presence
+            {
+                Attended = false,
+                ReasonAbsence = message,
+                Student = student,
+                Lecture = lecture
+            };
 
-        _ctx.Presences.Add(presence);
+            _ctx.Presences.Add(presence);
 
-        await _ctx.SaveChangesAsync();
-    }
+            await _ctx.SaveChangesAsync();
+            return true;
+        }
 
-    public async Task<string> PingPing()
-    {
-        return "Ping Ping";
-        //await commandCtx.Channel.SendMessageAsync("Pong");
-        //await _ctx.SaveChangesAsync();
+        return false;
     }
 }
