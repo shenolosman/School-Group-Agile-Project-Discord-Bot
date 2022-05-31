@@ -46,8 +46,10 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment()) await ctx.RecreateAsync();
 }
 
-var bot = new Bot();
+var bot = new Bot(app.Services);
+
 bot.RunAsync().GetAwaiter();
+
 var csvCreateFile = new CsvProgram();
 
 app.Run();
