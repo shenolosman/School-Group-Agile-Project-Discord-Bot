@@ -21,28 +21,35 @@ public class PresenceHandler
             .ThenInclude(x => x.Lectures)!
             .ThenInclude(x => x.Class)
             .ThenInclude(x => x.Teachers)
-            .Where(x => x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher!.Name == selectedTeacher)
+            .Where(x => x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass &&
+                        x.Lecture.Teacher!.Name == selectedTeacher)
             .ToListAsync();
     }
+
     //Depends on ui using may change into just 1 method via changing Attended attribute!
-    public async Task<List<Presence>> GetAllPresenceAttendees(DateTime date, string selectedClass, string selectedTeacher)
+    public async Task<List<Presence>> GetAllPresenceAttendees(DateTime date, string selectedClass,
+        string selectedTeacher)
     {
         return await _ctx.Presences
             .Include(x => x.Student)
             .ThenInclude(x => x.Lectures)!
             .ThenInclude(x => x.Class)
             .ThenInclude(x => x.Teachers)
-            .Where(x => x.Attended && x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher!.Name == selectedTeacher)
+            .Where(x => x.Attended && x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass &&
+                        x.Lecture.Teacher!.Name == selectedTeacher)
             .ToListAsync();
     }
-    public async Task<List<Presence>> GetAllAbsenceAttendees(DateTime date, string selectedClass, string selectedTeacher)
+
+    public async Task<List<Presence>> GetAllAbsenceAttendees(DateTime date, string selectedClass,
+        string selectedTeacher)
     {
         return await _ctx.Presences
             .Include(x => x.Student)
             .ThenInclude(x => x.Lectures)!
             .ThenInclude(x => x.Class)
             .ThenInclude(x => x.Teachers)
-            .Where(x => !x.Attended && x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher!.Name == selectedTeacher)
+            .Where(x => !x.Attended && x.Lecture.Date == date && x.Lecture.Class.Name == selectedClass &&
+                        x.Lecture.Teacher!.Name == selectedTeacher)
             .ToListAsync();
     }
 
@@ -55,17 +62,21 @@ public class PresenceHandler
             .Where(x => x.Student.Name == studentName)
             .ToListAsync();
     }
+
     //gonna make through date listing
-    public List<Presence> DateFilterOfPresences(List<Presence> query, DateTime startDate, DateTime endDate, string selectedClass, string selectedTeacher)
+    public List<Presence> DateFilterOfPresences(List<Presence> query, DateTime startDate, DateTime endDate,
+        string selectedClass, string selectedTeacher)
     {
         return query.Where(presence => (presence.Lecture.Date.Month > startDate.Month ||
-                                        (presence.Lecture.Date.Month == startDate.Month &&
-                                         presence.Lecture.Date.Day >= startDate.Day))
+                                        presence.Lecture.Date.Month == startDate.Month &&
+                                        presence.Lecture.Date.Day >= startDate.Day)
                                        &&
                                        (presence.Lecture.Date.Month < endDate.Month ||
-                                        (presence.Lecture.Date.Month == endDate.Month &&
-                                         presence.Lecture.Date.Day <= endDate.Day))).Where(x => x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
+                                        presence.Lecture.Date.Month == endDate.Month &&
+                                        presence.Lecture.Date.Day <= endDate.Day)).Where(x =>
+            x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
     }
+
     public async Task<List<Presence>> GetAttendanceList()
     {
         var attendanceList = await _ctx.Presences
@@ -78,39 +89,33 @@ public class PresenceHandler
         return attendanceList;
     }
 
-
-    //ta in vilken elev
-    //spara ner frånvaro i db på rätt elev och klass?
-    //spara
-    //?returnera en text om lyckat kasnke
-    public async Task RegisterAbsenceForStudent(ulong studentId)
+    public async Task RegisterAbsenceForStudent(ulong studentId, string channel, DateTime date)
     {
-        //await commandCtx.Channel.SendMessageAsync("Pong");
-
-        //var student = _ctx.Students
-        //    .Include(x => x.Lectures)
-        //    .Include(x=>x.Presences)
-        //    .Where(x => x.Id == studentId)
-        //    .FirstOrDefault();
-
-
-        //vill regestrera presence
-
-        //behöver Student
+        var message = "Registered absence";
 
         var student = _ctx.Students
             .Where(x => x.Id == studentId)
-            .FirstOrDefault();
+            .First();
 
-        //behöver Lecture
+        var classget = _ctx.Classes
+            .Where(x => x.Name == channel)
+            .First();
 
+        var lecture = _ctx.Lectures
+            .Where(x => x.Class == classget && x.Date == date)
+            .First();
 
-        //behöver Date
+        var presence = new Presence
+        {
+            Attended = false,
+            ReasonAbsence = message,
+            Student = student,
+            Lecture = lecture
+        };
 
-        //behöver Class
+        _ctx.Presences.Add(presence);
 
-
-        //await _ctx.SaveChangesAsync();
+        await _ctx.SaveChangesAsync();
     }
 
     public async Task<string> PingPing()

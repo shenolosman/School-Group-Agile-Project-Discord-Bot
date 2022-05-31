@@ -49,14 +49,14 @@ public class Bot
             Timeout = TimeSpan.FromMinutes(10)
         });
 
-            var commandConfig = new CommandsNextConfiguration
-            {
-                StringPrefixes = new string[] { configJson.Prefix },
-                EnableDms = true,
-                EnableMentionPrefix = true,
-                DmHelp = true,
-                // Set CaseSensitive to true if we want to make commands case sensitive!
-                CaseSensitive = false,
+        var commandConfig = new CommandsNextConfiguration
+        {
+            StringPrefixes = new[] {configJson.Prefix},
+            EnableDms = true,
+            EnableMentionPrefix = true,
+            DmHelp = true,
+            // Set CaseSensitive to true if we want to make commands case sensitive!
+            CaseSensitive = false
 
             //Services = services //---- Dependency injection???
         };
@@ -66,12 +66,13 @@ public class Bot
         // Add Commands classes here for them to work
         Commands.RegisterCommands<GeneralCommands>();
 
-            Commands.RegisterCommands<AdminCommands>();
+        Commands.RegisterCommands<AdminCommands>();
 
-            Commands.RegisterCommands<TeacherCommands>();
+        Commands.RegisterCommands<TeacherCommands>();
+        Commands.RegisterCommands<StudentCommands>();
 
 
-            await Client.ConnectAsync();
+        await Client.ConnectAsync();
 
         await Task.Delay(-1);
     }

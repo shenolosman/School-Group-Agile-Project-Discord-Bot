@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<DbService>();
-//builder.Services.AddScoped<PresenceHandler>();
+builder.Services.AddScoped<PresenceHandler>();
 
 builder.Services.AddDbContext<PresenceDbContext>(options =>
     options.UseSqlServer(
@@ -45,6 +45,7 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsProduction()) await ctx.IsCreatedAsync();
     if (app.Environment.IsDevelopment()) await ctx.RecreateAsync();
 }
+
 var bot = new Bot();
 bot.RunAsync().GetAwaiter();
 var csvCreateFile = new CsvProgram();

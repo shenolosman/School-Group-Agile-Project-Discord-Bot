@@ -11,10 +11,13 @@ public class StudentCommands : BaseCommandModule
     [Description("Sends absence")]
     public async Task Absence(CommandContext commandCtx)
     {
-        //id att skicka med till databasen
         var studentId = commandCtx.User.Id;
+        var classname = commandCtx.Channel.Guild.Name;
+        var date = commandCtx.Message.Timestamp.DateTime;
 
-        //om lyckat
-        await commandCtx.Channel.SendMessageAsync("Registered absence");
+        // RegisterAbsenceForStudent(ulong studentId, string channel, DateTime date)
+
+        //await commandCtx.Channel.SendMessageAsync("Registered absence");
+        await commandCtx.Channel.SendMessageAsync("id: " + studentId + " ch: " + classname + " date: " + date);
     }
 }
