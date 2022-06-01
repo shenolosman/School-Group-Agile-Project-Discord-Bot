@@ -54,11 +54,11 @@ namespace Princess.Bot.Commands
                 var newTeacherEmbed = new DiscordEmbedBuilder
                 {
                     Title = "New Teacher!",
-                    Description = $"{newTeacher.Nickname} is now a teacher!",
+                    Description = $"{newTeacher.Nickname ?? newTeacher.Username} is now a teacher!",
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         IconUrl = cmdCtx.User.AvatarUrl,
-                        Name = cmdCtx.User.Username,
+                        Name = cmdCtx.Member.Nickname ?? cmdCtx.Member.Username ,
                     },
 
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()

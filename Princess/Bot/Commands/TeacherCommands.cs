@@ -73,6 +73,8 @@ namespace Princess.Bot.Commands
                 Color = DiscordColor.Gold,
             };
 
+            await cmdCtx.Message.DeleteAsync();
+
             var dmEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
@@ -171,6 +173,36 @@ namespace Princess.Bot.Commands
                     }
                 }
             }
+
+            var teacherDm = new DiscordEmbedBuilder
+            {
+                Title = "Gathered Presence Check Info",
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
+                    Name = cmdCtx.Client.CurrentUser.Username,
+                },
+                Color = DiscordColor.Gold,
+                Description = $"Here is the gathered info from the presence-check you made in {cmdCtx.Channel.Mention}.\nPresent: {totalThumbsUp}\nAbsent: XX\nTotal students in {cmdCtx.Guild.Name}: XX\nTo see further information and to be able to export the presence-check use this link:\n https://localhost:8000",
+                Timestamp = cmdCtx.Message.Timestamp,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                {
+                    Url = cmdCtx.Client.CurrentUser.AvatarUrl,
+                },
+                Url = "https://localhost:8000",
+            };
+
+            try
+            {
+
+                await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
             // TODO Save all variables needed to be sent into database, Make checks (is the teacher already registered in DB? Then dont create a new teacher just update, and so on)
 
             // IMPORTANT, schoolClass is and should be temporary, right now we dont do any checks if there is an class already made. Move students from the class in db to new lecture
