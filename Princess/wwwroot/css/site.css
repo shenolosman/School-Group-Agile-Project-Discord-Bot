@@ -14,5 +14,78 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #32485C;
+    color: aliceblue
+}
+
+.bg-greenBlack {
+    background: rgb(50, 72, 92);
+    background: linear-gradient(-30deg, rgba(50, 72, 92, 1) 3%, rgba(50, 72, 92, 1) 24%, rgba(55, 77, 96, 1) 26%, rgba(78, 100, 113, 1) 35%, rgba(160, 182, 176, 1) 68%, rgba(207, 230, 212, 1) 87%, rgba(212, 235, 216, 1) 89%) !important;
+}
+.nav-label {
+    font-size: 25px;
+    text-shadow: 1px 0 0 #374d60, -1px 0 0 #374d60, 0 -1px 0 #374d60, 1px 1px #374d60, -1px -1px 0 #374d60, 1px -1px 0 #374d60, -1px 1px 0 #374d60;
+    color: #d4ebd8 !important;
+}
+.nav-text {
+    color: #374d60 !important;
+}
+.navbar {
+    border: none !important;
+}
+.navbar-default .navbar-nav li a {
+    color: #374d60;
+}
+.footer-text {
+    color: aliceblue
+}
+.bg-table {
+    background-color: #374d60;
+    box-shadow: 2px 0 0 #cfe6d4, -2px 0 0 #cfe6d4, 0 -2px 0 #cfe6d4, 1px 1px #cfe6d4, -1px -1px 0 aliceblue, 1px -1px 0 #cfe6d4, -1px 1px 0 #cfe6d4;
+    color: aliceblue
+}
+.header-table {
+    border-collapse: collapse;
+    color: aliceblue;
+    font-size: 0.9em;
+    margin: 25px 0;
+}
+    .header-table thead tr {
+        text-align: left;
+        font-weight: bold;
+    }
+.ctx-table {
+    margin: 25px 0;
+}
+.ctx-table thead td {
+    text-align: left;
+    font-weight: bold;
+}
+.tdSize {
+    width: 16.6%;
+    text-align: left;
+    margin: auto;
+}
+#triangleTwo {
+    background-color: #a0b6b0;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    width: 100%;
+    height: 80px;
+}
+.background {
+    background-color: #32485C;
+}
+.page-link {
+    color: aliceblue;
+    background-color: #32485c
+}
+    .page-link:hover {
+        color: #32485c;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+input#student_Attended {
+    width: 23px;
+    height: 23px;
 }
