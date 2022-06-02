@@ -27,13 +27,38 @@ namespace Princess.Bot.Commands
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
                 var triviaQuizList = await triviaQuestions.GetAttendanceQuestions();
 
+                var quizEmbed = new DiscordEmbedBuilder
+                {
+                    Title = $"\n{triviaQuizList[0].QuestionString}", // [0] first item in the TriviaQuizList
+                    Description =  $"\n1." +
+                                  $" {triviaQuizList[0].CorrectAnswer}, " +
+                                  $"2. {triviaQuizList[0].IncorrectAnswers[0]}, " +
+                                  $"3. {triviaQuizList[0].IncorrectAnswers[1]}, " +
+                                  $"4. {triviaQuizList[0].IncorrectAnswers[2]} ",
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = cmdCtx.User.AvatarUrl,
+                        Name = cmdCtx.User.Username,
+                    },
+
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                    {
+                        Url = cmdCtx.Client.CurrentUser.AvatarUrl
+                    },
+                    Footer = new DiscordEmbedBuilder.EmbedFooter()
+                    {
+                        Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
+                    },
+                    Color = DiscordColor.Gold,
+                };
+
                 var stringReplace = String.Empty;
 
                 if (triviaQuizList[0].QuestionString.Contains("&quot;") || triviaQuizList[0].QuestionString.Contains("&#039;") ||
                     triviaQuizList[0].QuestionString.Contains("&deg;") || triviaQuizList[0].QuestionString.Contains("&amp;") ||
                     triviaQuizList[0].QuestionString.Contains("&pi;") || triviaQuizList[0].QuestionString.Contains("&rdquo;") ||
                     triviaQuizList[0].QuestionString.Contains("&ldquo"))
-                {
+                { 
                     stringReplace += triviaQuizList[0].QuestionString
                         .Replace("&quot;", "\"")
                         .Replace("&#039;", "'")
@@ -41,18 +66,40 @@ namespace Princess.Bot.Commands
                         .Replace("&amp;", "&")
                         .Replace("&pi;", "π")
                         .Replace("&rdquo;", "\"")
-                        .Replace("&ldquo", "\"");
+                        .Replace("&ldquo;", "\"");
 
-                    await cmdCtx.Channel.SendMessageAsync($"{stringReplace}");
-                }
-                else if (!triviaQuizList[0].QuestionString.Contains("?") || !triviaQuizList[0].QuestionString.Contains(":"))
-                {
-                    await cmdCtx.Channel.SendMessageAsync($"{triviaQuizList[0].QuestionString} \nTrue/False?");
+
+                    var quizReplaceEmbed = new DiscordEmbedBuilder
+                   {
+                       Title = $"\n{stringReplace}",
+                       Description = $"\n1." +
+                                     $" {triviaQuizList[0].CorrectAnswer}, " +
+                                     $"2. {triviaQuizList[0].IncorrectAnswers[0]}, " +
+                                     $"3. {triviaQuizList[0].IncorrectAnswers[1]}, " +
+                                     $"4. {triviaQuizList[0].IncorrectAnswers[2]} ",
+                       Author = new DiscordEmbedBuilder.EmbedAuthor
+                       {
+                           IconUrl = cmdCtx.User.AvatarUrl,
+                           Name = cmdCtx.User.Username,
+                       },
+
+                       Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                       {
+                           Url = cmdCtx.Client.CurrentUser.AvatarUrl
+                       },
+                       Footer = new DiscordEmbedBuilder.EmbedFooter()
+                       {
+                           Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
+                       },
+                        Color = DiscordColor.Gold,
+                   };
+
+                    await cmdCtx.Channel.SendMessageAsync(embed: quizReplaceEmbed);
                 }
                 else
                 {
-                    await cmdCtx.Channel.SendMessageAsync(
-                        $"{triviaQuizList[0].QuestionString}"); //[0] first item in the TriviaQuizList
+                    await cmdCtx.Channel.SendMessageAsync(embed:
+                        quizEmbed);
                 }
             }
         }
