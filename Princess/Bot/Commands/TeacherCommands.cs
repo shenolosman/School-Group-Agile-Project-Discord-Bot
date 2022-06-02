@@ -1,8 +1,12 @@
-﻿using DSharpPlus;
+﻿using System.Net.Http.Headers;
+using System.Web;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
+using Newtonsoft.Json;
+using Princess.Bot.Services;
 using Princess.Data;
 using Princess.Models;
 using Princess.Services;
@@ -11,6 +15,48 @@ namespace Princess.Bot.Commands
 {
     public class TeacherCommands : BaseCommandModule
     {
+
+        [Command("attendanceQuestion")] //rename command? presenceQuiz?
+        [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
+                     "Students answer to a question and you will get who was present.")]
+        [RequireRoles(RoleCheckMode.Any, "Teacher")]
+        public async Task AttendanceQuestion(CommandContext cmdCtx) //,[Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration
+        {
+            await using (var scope = cmdCtx.Services.CreateAsyncScope())
+            {
+                var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
+                var triviaQuizList = await triviaQuestions.GetAttendanceQuestions();
+
+                var stringReplace = String.Empty;
+
+                if (triviaQuizList[0].QuestionString.Contains("&quot;") || triviaQuizList[0].QuestionString.Contains("&#039;") ||
+                    triviaQuizList[0].QuestionString.Contains("&deg;") || triviaQuizList[0].QuestionString.Contains("&amp;") ||
+                    triviaQuizList[0].QuestionString.Contains("&pi;") || triviaQuizList[0].QuestionString.Contains("&rdquo;") ||
+                    triviaQuizList[0].QuestionString.Contains("&ldquo"))
+                {
+                    stringReplace += triviaQuizList[0].QuestionString
+                        .Replace("&quot;", "\"")
+                        .Replace("&#039;", "'")
+                        .Replace("&deg;", "°")
+                        .Replace("&amp;", "&")
+                        .Replace("&pi;", "π")
+                        .Replace("&rdquo;", "\"")
+                        .Replace("&ldquo", "\"");
+
+                    await cmdCtx.Channel.SendMessageAsync($"{stringReplace}");
+                }
+                else if (!triviaQuizList[0].QuestionString.Contains("?") || !triviaQuizList[0].QuestionString.Contains(":"))
+                {
+                    await cmdCtx.Channel.SendMessageAsync($"{triviaQuizList[0].QuestionString} \nTrue/False?");
+                }
+                else
+                {
+                    await cmdCtx.Channel.SendMessageAsync(
+                        $"{triviaQuizList[0].QuestionString}"); //[0] first item in the TriviaQuizList
+                }
+            }
+        }
+
         [Command("PresenceCheck")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
@@ -263,7 +309,7 @@ namespace Princess.Bot.Commands
             // In this scope you can use services, example: var variableName = scope.ServiceProvider.GetRequiredService<WhatEverServiceYouWant>();
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
-
+               
             }
         }
     }

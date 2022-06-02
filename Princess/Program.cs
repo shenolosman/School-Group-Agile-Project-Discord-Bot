@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
+using Princess.Bot.Services;
 using Princess.CSV;
 using Princess.Data;
 using Princess.Services;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<DbService>();
 builder.Services.AddScoped<PresenceHandler>();
+builder.Services.AddScoped<TriviaQuestions>();
 
 builder.Services.AddDbContext<PresenceDbContext>(options =>
     options.UseSqlServer(
