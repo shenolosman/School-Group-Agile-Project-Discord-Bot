@@ -1,12 +1,16 @@
 ﻿using System.Text;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Princess.Bot.Commands;
+using Princess.Data;
+using Princess.Models;
 using TestBot;
 
 namespace Princess.Bot;
@@ -85,11 +89,62 @@ public class Bot
         await Task.Delay(-1);
     }
 
-
-    private Task OnClientReady(DiscordClient sender, ReadyEventArgs e)
+    // When bot starts it will check if guild(class) exists in DB - If StudentRole & TeacherRole doesn't exist, create the roles on the server.
+    private async Task<Task> OnClientReady(DiscordClient sender, ReadyEventArgs e)
     {
-        // Put code here if you want to do something like "Bot is online" in Chat. 
+        var listOfGuilds = new List<DiscordGuild>();
 
+        // Only contains ID of guilds
+        var botGuilds = sender.Guilds.Values;
+
+        foreach (var guild in botGuilds)
+        {
+            // Fetched the rest of the information about the guild
+            var fetchedGuild = await sender.GetGuildAsync(guild.Id, true);
+            listOfGuilds.Add(fetchedGuild);
+        }
+
+        await using (var scope = Commands.Services.CreateAsyncScope())
+        {
+            var ctx = scope.ServiceProvider.GetRequiredService<PresenceDbContext>();
+
+            foreach (var guild in listOfGuilds)
+            {
+                bool guildInDB = await ctx.Classes.AnyAsync(c => c.Id == guild.Id);
+
+                if (!guildInDB && guild.Name != "")
+                {
+                    var schoolClass = new Class
+                    {
+                        Id = guild.Id,
+                        Name = guild.Name,
+                        Lectures = new List<Lecture>(),
+                        Teachers = new List<Teacher>(),
+                        Students = new List<Student>(),
+                    };
+                    try
+                    {
+                        await ctx.Classes.AddAsync(schoolClass);
+                        await ctx.SaveChangesAsync();
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                        throw;
+                    }
+                }
+                // Check for teacher and stundent roles and create them id they dont exist
+                var guildRoles = guild.Roles;
+
+                if (guildRoles == null)
+                {
+                }
+                foreach (var role in guildRoles.Values)
+                {
+                }
+            }
+        }
+        
         return Task.CompletedTask;
     }
 }
