@@ -14,6 +14,11 @@ namespace Princess.Controllers
             _logger = logger;
             _presenceHandler = presenceHandler;
         }
+
+        public IActionResult Lecture(int id)
+        {
+            return View(id);
+        }
         private async Task<AttendanceView> GetAttendanceList(int currentPage)
         {
             var maxRowsPerPage = 10;

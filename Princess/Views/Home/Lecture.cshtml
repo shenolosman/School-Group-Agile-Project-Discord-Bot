@@ -1,0 +1,62 @@
+﻿@model dynamic
+
+@using Princess.Services
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject PresenceHandler _presenceHandler
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Lecture";
+    ViewData["Header-title"] = "Pr3s3nc3 Overview";
+
+
+    var lecture = await _presenceHandler.GetLectureAsync(Model);
+
+    List<Presence> presenceList = await _presenceHandler.GetPresencesAsync(Model);
+    
+
+}
+<br>
+<div class="d-flex ms-auto">
+    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
+    <a asp-controller="Home" asp-action="Index">Home</a>
+</div>
+
+
+
+<table class="table header-table">
+    <thead>
+    <tr>
+        <th class="tdSize" scope="col">Class</th>
+        <th class="tdSize" scope="col">Teacher</th>
+        <th class="tdSize" scope="col">Date | Time</th>
+        <th class="tdSize" scope="col">Student</th>
+        <th class="tdSize" scope="col">Present</th>
+        <th class="tdSize" scope="col">Comment</th>
+    </tr>
+    </thead>
+</table>
+
+@foreach (var student in lecture.Students)
+{
+        
+    <table class="table bg-table ctx-table">
+        <tbody> 
+        <tr> 
+            <td class="tdSize" scope="row">@lecture.Class.Name</td>
+            <td class="tdSize">@lecture.Teacher.Name</td>
+            <td class="tdSize">@lecture.Date.ToShortDateString(), @lecture.Date.ToShortTimeString()</td>
+            <td class="tdSize">@student.Name</td>
+            <td class="tdSize">@presenceList.Find(p => p.Student == student).Attended </td>
+            <td class="tdSize">@presenceList.Find(p => p.Student == student).ReasonAbsence</td>
+        </tr>
+        </tbody>
+    </table>
+}
+
+
+
+
+

@@ -13,6 +13,36 @@ public class PresenceHandler
         _ctx = ctx;
     }
 
+    // returns a lecture with the given id. Includes class, student, the student's precenses adn teh teacher.
+    // Make sure to match the precens' id with the lecture.
+    public async Task<Lecture> GetLectureAsync(int id)
+    {
+       var lecture = await _ctx.Lectures.Include(l => l.Students).ThenInclude(s => s.Presences)
+           .Include(l => l.Class)
+           .Include(l => l.Teacher)
+           .Where(l => l.Id == id).FirstOrDefaultAsync();
+       if (lecture != null)
+       {
+           return lecture;
+       }
+
+       return null;
+    }
+    // get presences connected to certain lecture
+    public async Task<List<Presence>> GetPresencesAsync(int lectureId)
+    {
+        var presenceList = _ctx.Presences.Include(l => l.Lecture).Include(p => p.Student).Where(l => l.Lecture.Id == lectureId).ToList();
+
+        
+
+        if (presenceList != null)
+        {
+            return presenceList;
+        }
+
+        return null;
+    }
+
     public async Task<List<Presence>> GetAllAttendees(DateTime date, string selectedClass, string selectedTeacher)
     {
         return await _ctx.Presences

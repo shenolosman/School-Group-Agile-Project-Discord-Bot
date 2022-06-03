@@ -189,7 +189,7 @@ namespace Princess.Bot.Commands
                 {
                     Url = cmdCtx.Client.CurrentUser.AvatarUrl,
                 },
-                Url = "https://localhost:8000",
+                Url = $@"https://localhost:8000/Home/Lecture/1",
             };
 
             try
