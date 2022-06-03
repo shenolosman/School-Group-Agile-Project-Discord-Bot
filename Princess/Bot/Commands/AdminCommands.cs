@@ -44,13 +44,14 @@ public class AdminCommands : BaseCommandModule
                 return;
             }
 
-            await CreateTeacherRoleIfNotFoundAsync(cmdCtx);
-
-
-            var serverRoles = cmdCtx.Guild.Roles;
-            foreach (var role in serverRoles)
-                if (role.Value.Name == "Teacher")
-                    await newTeacher.GrantRoleAsync(role.Value);
+                var serverRoles = cmdCtx.Guild.Roles;
+                foreach (var role in serverRoles )
+                {
+                    if (role.Value.Name == "Teacher")
+                    {
+                        await newTeacher.GrantRoleAsync(role.Value);
+                    }
+                }
 
             var newTeacherEmbed = new DiscordEmbedBuilder
             {
@@ -75,17 +76,25 @@ public class AdminCommands : BaseCommandModule
         }
     }
 
-    public async Task CreateTeacherRoleIfNotFoundAsync(CommandContext cmdCtx)
-    {
-        var serverRoles = cmdCtx.Guild.Roles;
-        var serverHasTeacherRole = false;
+        // Move this to a Util service?
+        //public async Task CreateTeacherRoleIfNotFoundAsync(CommandContext cmdCtx)
+        //{
+        //    var serverRoles = cmdCtx.Guild.Roles;
+        //    bool serverHasTeacherRole = false;
 
-        foreach (var role in serverRoles)
-            if (role.Value.Name == "Teacher")
-                serverHasTeacherRole = true;
+        //    foreach (var role in serverRoles)
+        //    {
+        //        if (role.Value.Name == "Teacher")
+        //        {
+        //            serverHasTeacherRole = true;
+        //        }
+        //    }
 
-        if (!serverHasTeacherRole)
-            await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
-                true);
+        //    if (!serverHasTeacherRole)
+        //    {
+        //        await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
+        //            true);
+        //    }
+        //}
     }
 }

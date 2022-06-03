@@ -36,6 +36,9 @@ app.UseAuthorization();
 app.MapControllerRoute(
     "default",
     "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    "Lecture",
+    "{controller=Home}/{action=Lecture}/{id}");
 
 using (var scope = app.Services.CreateScope())
 {

@@ -11,7 +11,7 @@ namespace Princess.Bot.Commands
 {
     public class TeacherCommands : BaseCommandModule
     {
-        [Command("PresenceCheck")]
+        [Command("Presence")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
         public async Task PresenceCheck(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")]TimeSpan reactionDuration)
@@ -35,7 +35,7 @@ namespace Princess.Bot.Commands
                 try
                 {
                     // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
-                    await cmdCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, null, true, "This role is needed to send a presence check to all students in guild");
+                    await cmdCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, true, true, "This role is needed to send a presence check to all students in guild");
                 }
                 catch (Exception e)
                 {
@@ -174,34 +174,7 @@ namespace Princess.Bot.Commands
                 }
             }
 
-            var teacherDm = new DiscordEmbedBuilder
-            {
-                Title = "Gathered Presence Check Info",
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
-                    Name = cmdCtx.Client.CurrentUser.Username,
-                },
-                Color = DiscordColor.Gold,
-                Description = $"Here is the gathered info from the presence-check you made in {cmdCtx.Channel.Mention}.\nPresent: {totalThumbsUp}\nAbsent: XX\nTotal students in {cmdCtx.Guild.Name}: XX\nTo see further information and to be able to export the presence-check use this link:\n https://localhost:8000",
-                Timestamp = cmdCtx.Message.Timestamp,
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
-                {
-                    Url = cmdCtx.Client.CurrentUser.AvatarUrl,
-                },
-                Url = "https://localhost:8000",
-            };
 
-            try
-            {
-
-                await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
 
             // TODO Save all variables needed to be sent into database, Make checks (is the teacher already registered in DB? Then dont create a new teacher just update, and so on)
 
@@ -249,6 +222,35 @@ namespace Princess.Bot.Commands
                 Teacher = teacher,
                 Students = students,
             };
+
+            var teacherDm = new DiscordEmbedBuilder
+            {
+                Title = "Gathered Presence Check Info",
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
+                    Name = cmdCtx.Client.CurrentUser.Username,
+                },
+                Color = DiscordColor.Gold,
+                Description = $"Here is the gathered info from the presence-check you made in {cmdCtx.Channel.Mention}.\nPresent: {totalThumbsUp}\nAbsent: XX\nTotal students in {cmdCtx.Guild.Name}: XX\nTo see further information and to be able to export the presence-check use this link:\n https://localhost:8000/Home/Lecture/{lecture.Id}",
+                Timestamp = cmdCtx.Message.Timestamp,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                {
+                    Url = cmdCtx.Client.CurrentUser.AvatarUrl,
+                },
+                Url = $@"https://localhost:8000/Home/Lecture/{lecture.Id}",
+            };
+
+            try
+            {
+
+                await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
             foreach (var student in students)
             {
