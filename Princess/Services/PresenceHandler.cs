@@ -1,3 +1,4 @@
+using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Princess.Data;
 using Princess.Models;
@@ -109,5 +110,27 @@ public class PresenceHandler
         }
 
         return false;
+    }
+
+    //Adds the member from discord to table "Teachers" in database
+    public async Task RegisterTeacherToDatabase(DiscordMember member)
+    {
+        var newTeacher = new Teacher
+        {
+            //Id = member.Id,
+            Name = member.Nickname ?? member.Username
+        };
+        _ctx.Teachers.Add(newTeacher);
+        await _ctx.SaveChangesAsync();
+    }
+
+    //If the nickname/username exists in the table "Teachers" database, return true
+    public async Task<bool> TeacherExists(string name)
+    {
+        var teacher = await _ctx.Teachers
+            .Where(n => n.Name == name)
+            .FirstOrDefaultAsync();
+
+        return teacher != null;
     }
 }

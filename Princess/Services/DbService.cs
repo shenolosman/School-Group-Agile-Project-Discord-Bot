@@ -20,7 +20,8 @@ public class DbService
         var teacher = new List<Teacher>
         {
             new() {Name = "Björn"},
-            new() {Name = "Pernilla"}
+            new() {Name = "Pernilla"},
+            new() {Name = "Natalie Nilsson"}
         };
 
         var students = new List<Student>
