@@ -83,7 +83,6 @@ public class Bot
 
         Commands.RegisterCommands<StudentCommands>();
 
-
         await Client.ConnectAsync();
 
         await Task.Delay(-1);
@@ -112,7 +111,7 @@ public class Bot
             {
                 bool guildInDB = await ctx.Classes.AnyAsync(c => c.Id == guild.Id);
 
-                if (!guildInDB && guild.Name != "")
+                if (!guildInDB)
                 {
                     var schoolClass = new Class
                     {
@@ -133,18 +132,46 @@ public class Bot
                         throw;
                     }
                 }
-                // Check for teacher and stundent roles and create them id they dont exist
+
+                // Check for teacher and student roles and create them id they dont exist
                 var guildRoles = guild.Roles;
 
                 if (guildRoles == null)
                 {
+                    await guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
+                        true);
+                    await guild.CreateRoleAsync("Student",
+                        Permissions.SendMessages |
+                        Permissions.ChangeNickname |
+                        Permissions.AttachFiles |
+                        Permissions.Speak |
+                        Permissions.Stream |
+                        Permissions.UseVoice |
+                        Permissions.AccessChannels,
+                        DiscordColor.CornflowerBlue, null, true,
+                        "This role is needed to send a presence check to all students in guild");
                 }
-                foreach (var role in guildRoles.Values)
-                {
-                }
+
+                var teacherRoleExists = guildRoles.Values.Any(r => r.Name.ToLower() == "teacher");
+                var studentRoleExists = guildRoles.Values.Any(r => r.Name.ToLower() == "student");
+
+                if (!teacherRoleExists)
+                    await guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
+                        true);
+
+                if (!studentRoleExists)
+                    await guild.CreateRoleAsync("Student",
+                        Permissions.SendMessages |
+                        Permissions.ChangeNickname |
+                        Permissions.AttachFiles |
+                        Permissions.Speak |
+                        Permissions.Stream |
+                        Permissions.UseVoice |
+                        Permissions.AccessChannels,
+                        DiscordColor.CornflowerBlue, null, true,
+                        "This role is needed to send a presence check to all students in guild");
             }
         }
-        
         return Task.CompletedTask;
     }
 }
