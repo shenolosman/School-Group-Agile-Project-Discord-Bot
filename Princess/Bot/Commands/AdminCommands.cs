@@ -16,7 +16,6 @@ namespace Princess.Bot.Commands
             if (cmdCtx.Member.IsOwner || ((cmdCtx.Member.Permissions & Permissions.Administrator) != 0))
             {
 
-              
                 if (newTeacher == null)
                 {
                     var failedEmbed = new DiscordEmbedBuilder
@@ -39,9 +38,6 @@ namespace Princess.Bot.Commands
                     return;
                 }
 
-                await CreateTeacherRoleIfNotFoundAsync(cmdCtx);
-
-              
                 var serverRoles = cmdCtx.Guild.Roles;
                 foreach (var role in serverRoles )
                 {
@@ -73,30 +69,25 @@ namespace Princess.Bot.Commands
             }
         }
 
-        public async Task CreateTeacherRoleIfNotFoundAsync(CommandContext cmdCtx)
-        {
-            var serverRoles = cmdCtx.Guild.Roles;
-            bool serverHasTeacherRole = false;
+        // Move this to a Util service?
+        //public async Task CreateTeacherRoleIfNotFoundAsync(CommandContext cmdCtx)
+        //{
+        //    var serverRoles = cmdCtx.Guild.Roles;
+        //    bool serverHasTeacherRole = false;
 
-            foreach (var role in serverRoles)
-            {
-                if (role.Value.Name == "Teacher")
-                {
-                    serverHasTeacherRole = true;
-                }
-            }
+        //    foreach (var role in serverRoles)
+        //    {
+        //        if (role.Value.Name == "Teacher")
+        //        {
+        //            serverHasTeacherRole = true;
+        //        }
+        //    }
 
-            if (!serverHasTeacherRole)
-            {
-                await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
-                    true);
-            }
-
-
-            
-        }
-
-        
+        //    if (!serverHasTeacherRole)
+        //    {
+        //        await cmdCtx.Guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
+        //            true);
+        //    }
+        //}
     }
-          
 }
