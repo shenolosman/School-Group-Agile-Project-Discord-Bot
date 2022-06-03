@@ -74,7 +74,7 @@ public class Bot
 
         Commands = Client.UseCommandsNext(commandConfig);
 
-        // Add Commands classes here for them to work
+        // Add Command classes here for them to work
         Commands.RegisterCommands<GeneralCommands>();
 
         Commands.RegisterCommands<AdminCommands>();
@@ -98,7 +98,7 @@ public class Bot
 
         foreach (var guild in botGuilds)
         {
-            // Fetched the rest of the information about the guild
+            // Fetches the rest of the information about the guild
             var fetchedGuild = await sender.GetGuildAsync(guild.Id, true);
             listOfGuilds.Add(fetchedGuild);
         }
@@ -111,15 +111,13 @@ public class Bot
             {
                 bool guildInDB = await ctx.Classes.AnyAsync(c => c.Id == guild.Id);
 
+                // Adds guild to class in DB if it doesnt exist
                 if (!guildInDB)
                 {
                     var schoolClass = new Class
                     {
                         Id = guild.Id,
                         Name = guild.Name,
-                        Lectures = new List<Lecture>(),
-                        Teachers = new List<Teacher>(),
-                        Students = new List<Student>(),
                     };
                     try
                     {
@@ -133,7 +131,7 @@ public class Bot
                     }
                 }
 
-                // Check for teacher and student roles and create them id they dont exist
+                // Check for teacher and student roles and create them if they doesn't exist
                 var guildRoles = guild.Roles;
 
                 if (guildRoles == null)
@@ -150,16 +148,83 @@ public class Bot
                         Permissions.AccessChannels,
                         DiscordColor.CornflowerBlue, null, true,
                         "This role is needed to send a presence check to all students in guild");
+
+                    var noticeRoleCreationEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Creation of Roles",
+                        Description =
+                            $"A Teacher and Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            IconUrl = sender.CurrentUser.AvatarUrl,
+                            Name = sender.CurrentUser.Username,
+                        },
+
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        {
+                            Url = sender.CurrentUser.AvatarUrl
+                        },
+                        Color = DiscordColor.Gold,
+                    };
+
+                    var guildChannels = guild.Channels.Values;
+
+                    var channelToMessage = guildChannels.FirstOrDefault(channel => channel.Type == ChannelType.Text);
+
+                    try
+                    {
+                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                        throw;
+                    }
                 }
 
                 var teacherRoleExists = guildRoles.Values.Any(r => r.Name.ToLower() == "teacher");
                 var studentRoleExists = guildRoles.Values.Any(r => r.Name.ToLower() == "student");
 
                 if (!teacherRoleExists)
+                {
                     await guild.CreateRoleAsync("Teacher", Permissions.Administrator, DiscordColor.Goldenrod, true,
                         true);
 
+                    var noticeRoleCreationEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Creation Of Teacher Role",
+                        Description =
+                            $"A Teacher Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            IconUrl = sender.CurrentUser.AvatarUrl,
+                            Name = sender.CurrentUser.Username,
+                        },
+
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        {
+                            Url = sender.CurrentUser.AvatarUrl
+                        },
+                        Color = DiscordColor.Gold,
+                    };
+
+                    var guildChannels = guild.Channels.Values;
+
+                    var channelToMessage = guildChannels.FirstOrDefault(channel => channel.Type == ChannelType.Text);
+
+                    try
+                    {
+                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                        throw;
+                    }
+                }
+
                 if (!studentRoleExists)
+                {
                     await guild.CreateRoleAsync("Student",
                         Permissions.SendMessages |
                         Permissions.ChangeNickname |
@@ -170,6 +235,39 @@ public class Bot
                         Permissions.AccessChannels,
                         DiscordColor.CornflowerBlue, null, true,
                         "This role is needed to send a presence check to all students in guild");
+
+                    var noticeRoleCreationEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Creation Of Student Role",
+                        Description =
+                            $"A Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            IconUrl = sender.CurrentUser.AvatarUrl,
+                            Name = sender.CurrentUser.Username,
+                        },
+
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        {
+                            Url = sender.CurrentUser.AvatarUrl
+                        },
+                        Color = DiscordColor.Gold,
+                    };
+
+                    var guildChannels = guild.Channels.Values;
+
+                    var channelToMessage = guildChannels.FirstOrDefault(channel => channel.Type == ChannelType.Text);
+
+                    try
+                    {
+                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                        throw;
+                    }
+                }
             }
         }
         return Task.CompletedTask;
