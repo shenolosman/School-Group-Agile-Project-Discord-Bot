@@ -95,13 +95,26 @@ namespace Princess.Bot.Commands
             // Sends the embeded message from above in the channel the command was initiated.
             var presenceMessage = await cmdCtx.Channel.SendMessageAsync(embed: presenceEmbed);
 
-            // This is the part where all who is active on channel gets a DM that an presence-check is started. Doesnt work as intented yet.
-            foreach (var user in cmdCtx.Channel.Users)
+
+            // Sends a DM to all users with the student role when presence is called
+            var allMembersIcol =  await cmdCtx.Guild.GetAllMembersAsync();
+            var allMembers = new List<DiscordMember>(allMembersIcol);
+            foreach (var user in allMembers) 
             {
+                
                 try
                 {
-                    if (!user.IsBot)
-                        await user.SendMessageAsync(embed: dmEmbed);
+                    
+                    bool isStudent = false;
+
+                    foreach (var role in user.Roles)
+                    {
+                        if (role.Name == "Student")
+                        {
+                            await user.SendMessageAsync(embed: dmEmbed);
+                        }
+                    }
+
                 }
                 catch (Exception e)
                 {
