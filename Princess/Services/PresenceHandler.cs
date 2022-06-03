@@ -18,28 +18,23 @@ public class PresenceHandler
     // Make sure to match the precens' id with the lecture.
     public async Task<Lecture> GetLectureAsync(int id)
     {
-       var lecture = await _ctx.Lectures.Include(l => l.Students).ThenInclude(s => s.Presences)
-           .Include(l => l.Class)
-           .Include(l => l.Teacher)
-           .Where(l => l.Id == id).FirstOrDefaultAsync();
-       if (lecture != null)
-       {
-           return lecture;
-       }
+        var lecture = await _ctx.Lectures.Include(l => l.Students).ThenInclude(s => s.Presences)
+            .Include(l => l.Class)
+            .Include(l => l.Teacher)
+            .Where(l => l.Id == id).FirstOrDefaultAsync();
+        if (lecture != null) return lecture;
 
-       return null;
+        return null;
     }
+
     // get presences connected to certain lecture
     public async Task<List<Presence>> GetPresencesAsync(int lectureId)
     {
-        var presenceList = _ctx.Presences.Include(l => l.Lecture).Include(p => p.Student).Where(l => l.Lecture.Id == lectureId).ToList();
+        var presenceList = _ctx.Presences.Include(l => l.Lecture).Include(p => p.Student)
+            .Where(l => l.Lecture.Id == lectureId).ToList();
 
-        
 
-        if (presenceList != null)
-        {
-            return presenceList;
-        }
+        if (presenceList != null) return presenceList;
 
         return null;
     }
@@ -147,7 +142,7 @@ public class PresenceHandler
     {
         var newTeacher = new Teacher
         {
-            //Id = member.Id,
+            Id = member.Id,
             Name = member.Nickname ?? member.Username
         };
         _ctx.Teachers.Add(newTeacher);
