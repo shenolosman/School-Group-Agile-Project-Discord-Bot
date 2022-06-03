@@ -18,91 +18,177 @@ namespace Princess.Bot.Commands
 
         [Command("attendanceQuestion")] //rename command? presenceQuiz?
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
-                     "Students answer to a question and you will get who was present.")]
+                     "Students answer to a question and you will get who was present.")] 
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
-        public async Task AttendanceQuestion(CommandContext cmdCtx) //,[Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration
+        public async Task AttendanceQuestion(CommandContext cmdCtx,
+            [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
         {
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
                 var triviaQuizList = await triviaQuestions.GetAttendanceQuestions();
 
-                var quizEmbed = new DiscordEmbedBuilder
+                 var stringReplace = String.Empty;
+
+                     stringReplace += triviaQuizList[0].QuestionString
+                         .Replace("&quot;", "\"")
+                         .Replace("&#039;", "'")
+                         .Replace("&deg;", "°")
+                         .Replace("&amp;", "&")
+                         .Replace("&pi;", "π")
+                         .Replace("&rdquo;", "\"")
+                         .Replace("&ldquo;", "\"");
+
+                     var quizReplaceEmbed = new DiscordEmbedBuilder
+                     {
+                         Title = $"\n{stringReplace} ",
+                         Description = $"\n1." +
+                                       $" {triviaQuizList[0].CorrectAnswer}, " +   // [0] first item in the TriviaQuizList
+                                       $"2. {triviaQuizList[0].IncorrectAnswers[0]}, " + 
+                                       $"3. {triviaQuizList[0].IncorrectAnswers[1]}, " +
+                                       $"4. {triviaQuizList[0].IncorrectAnswers[2]} ",
+                         Author = new DiscordEmbedBuilder.EmbedAuthor
+                         {
+                             IconUrl = cmdCtx.User.AvatarUrl,
+                             Name = cmdCtx.User.Username,
+                         },
+ 
+                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                         {
+                             Url = cmdCtx.Client.CurrentUser.AvatarUrl
+                         },
+                         Footer = new DiscordEmbedBuilder.EmbedFooter()
+                         {
+                             Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
+                         },
+                         Color = DiscordColor.Gold,
+                     };
+
+                     var quizMessage = await cmdCtx.Channel.SendMessageAsync(embed: quizReplaceEmbed);
+                     
+                // Creates Discord-Emojis for the question 
+                var answerOne = DiscordEmoji.FromName(cmdCtx.Client, ":one:");
+                var answerTwo = DiscordEmoji.FromName(cmdCtx.Client, ":two:");
+                var answerThree = DiscordEmoji.FromName(cmdCtx.Client, ":three:");
+                var answerFour = DiscordEmoji.FromName(cmdCtx.Client, ":four:");
+
+                // Places the Discord-Emojis on the message
+                await quizMessage.CreateReactionAsync(answerOne);
+                await quizMessage.CreateReactionAsync(answerTwo);
+                await quizMessage.CreateReactionAsync(answerThree);
+                await quizMessage.CreateReactionAsync(answerFour);
+
+                // Working with interactivity
+                var interactivity = cmdCtx.Client.GetInteractivity();
+
+                var quizAnswers = await interactivity.CollectReactionsAsync(quizMessage, reactionDuration);
+
+                var userNameWhoReacted = new List<string>();
+                var everyOnesReaction = new List<DiscordUser>();
+
+                int totalFirstAnswers = 0;
+                int totalSecondAnswers = 0;
+                int totalThirdAnswers = 0;
+                int totalFourthAnswers = 0;
+
+                foreach (var answer in quizAnswers)
                 {
-                    Title = $"\n{triviaQuizList[0].QuestionString}", // [0] first item in the TriviaQuizList
-                    Description =  $"\n1." +
-                                  $" {triviaQuizList[0].CorrectAnswer}, " +
-                                  $"2. {triviaQuizList[0].IncorrectAnswers[0]}, " +
-                                  $"3. {triviaQuizList[0].IncorrectAnswers[1]}, " +
-                                  $"4. {triviaQuizList[0].IncorrectAnswers[2]} ",
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    if (answer.Emoji == answerOne)
                     {
-                        IconUrl = cmdCtx.User.AvatarUrl,
-                        Name = cmdCtx.User.Username,
-                    },
-
-                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        foreach (var user in answer.Users)
+                        {
+                            var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            if (member != null && !user.IsBot)
+                            {
+                                totalFirstAnswers++;
+                                userNameWhoReacted.Add(member.Nickname ?? member.Username);
+                            }
+                        }
+                    }
+                    if (answer.Emoji == answerTwo)
                     {
-                        Url = cmdCtx.Client.CurrentUser.AvatarUrl
-                    },
-                    Footer = new DiscordEmbedBuilder.EmbedFooter()
+                        foreach (var user in answer.Users)
+                        {
+                            var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            if (member != null && !user.IsBot)
+                            {
+                                totalSecondAnswers++;
+                                userNameWhoReacted.Add(member.Nickname ?? member.Username);
+                            }
+                        }
+                    }
+                    if (answer.Emoji == answerThree)
                     {
-                        Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
-                    },
-                    Color = DiscordColor.Gold,
-                };
+                        foreach (var user in answer.Users)
+                        {
+                            var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            if (member != null && !user.IsBot)
+                            {
+                                totalThirdAnswers++;
+                                userNameWhoReacted.Add(member.Nickname ?? member.Username);
+                            }
+                        }
+                    }
+                    if (answer.Emoji == answerFour)
+                    {
+                        foreach (var user in answer.Users)
+                        {
+                            var member = cmdCtx.Guild.Members.Values.FirstOrDefault(x => x.Id == user.Id);
+                            if (member != null && !user.IsBot)
+                            {
+                                totalFourthAnswers++;
+                                userNameWhoReacted.Add(member.Nickname ?? member.Username);
+                            }
+                        }
+                    }
+                }
 
-                var stringReplace = String.Empty;
+                // Collecting all answers in a list, just one answer per user
+                var containsEmojis = quizAnswers.Any(x =>
+                    x.Emoji == answerOne || x.Emoji == answerTwo || x.Emoji == answerThree || x.Emoji == answerFour);
 
-                if (triviaQuizList[0].QuestionString.Contains("&quot;") || triviaQuizList[0].QuestionString.Contains("&#039;") ||
-                    triviaQuizList[0].QuestionString.Contains("&deg;") || triviaQuizList[0].QuestionString.Contains("&amp;") ||
-                    triviaQuizList[0].QuestionString.Contains("&pi;") || triviaQuizList[0].QuestionString.Contains("&rdquo;") ||
-                    triviaQuizList[0].QuestionString.Contains("&ldquo"))
-                { 
-                    stringReplace += triviaQuizList[0].QuestionString
-                        .Replace("&quot;", "\"")
-                        .Replace("&#039;", "'")
-                        .Replace("&deg;", "°")
-                        .Replace("&amp;", "&")
-                        .Replace("&pi;", "π")
-                        .Replace("&rdquo;", "\"")
-                        .Replace("&ldquo;", "\"");
+                foreach (var result in quizAnswers)
+                {
+                    if (containsEmojis)
+                    {
+                        var isBot = result.Users.Any(x => x.IsBot);
 
+                        foreach (var user in result.Users)
+                        {
+                            if (!isBot && !everyOnesReaction.Contains(user)) everyOnesReaction.Add(user);
+                        }
+                    }
+                }
 
-                    var quizReplaceEmbed = new DiscordEmbedBuilder
-                   {
-                       Title = $"\n{stringReplace}",
-                       Description = $"\n1." +
-                                     $" {triviaQuizList[0].CorrectAnswer}, " +
-                                     $"2. {triviaQuizList[0].IncorrectAnswers[0]}, " +
-                                     $"3. {triviaQuizList[0].IncorrectAnswers[1]}, " +
-                                     $"4. {triviaQuizList[0].IncorrectAnswers[2]} ",
-                       Author = new DiscordEmbedBuilder.EmbedAuthor
-                       {
-                           IconUrl = cmdCtx.User.AvatarUrl,
-                           Name = cmdCtx.User.Username,
-                       },
+                if (totalFirstAnswers > 0 || totalSecondAnswers > 0 ||
+                    totalThirdAnswers > 0 ||
+                    totalFourthAnswers > 0)
+                {
 
-                       Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
-                       {
-                           Url = cmdCtx.Client.CurrentUser.AvatarUrl
-                       },
-                       Footer = new DiscordEmbedBuilder.EmbedFooter()
-                       {
-                           Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
-                       },
-                        Color = DiscordColor.Gold,
-                   };
+                    await cmdCtx.Channel.SendMessageAsync($"Result of the question:");
+                    await cmdCtx.Channel.SendMessageAsync($":one: {totalFirstAnswers}");
+                    await cmdCtx.Channel.SendMessageAsync($":two: {totalSecondAnswers}");
+                    await cmdCtx.Channel.SendMessageAsync($":three: {totalThirdAnswers}");
+                    await cmdCtx.Channel.SendMessageAsync($":four: {totalFourthAnswers}");
 
-                    await cmdCtx.Channel.SendMessageAsync(embed: quizReplaceEmbed);
+                    foreach (var user in everyOnesReaction)
+                    {
+                        var username = user.Username;
+
+                        await cmdCtx.Channel.SendMessageAsync(string.Join("\n", username));
+                        // or userNameWhoReacted 
+                    }
+                    await cmdCtx.Channel.SendMessageAsync(
+                        $"The correct answer: {triviaQuizList[0].CorrectAnswer}");
                 }
                 else
                 {
-                    await cmdCtx.Channel.SendMessageAsync(embed:
-                        quizEmbed);
+                    await cmdCtx.Channel.SendMessageAsync($"None answered...none is present today!");
                 }
             }
         }
+        
+
 
         [Command("PresenceCheck")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
