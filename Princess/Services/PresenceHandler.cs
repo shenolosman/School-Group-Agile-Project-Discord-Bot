@@ -1,3 +1,4 @@
+using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Princess.Data;
 using Princess.Models;
@@ -17,28 +18,23 @@ public class PresenceHandler
     // Make sure to match the precens' id with the lecture.
     public async Task<Lecture> GetLectureAsync(int id)
     {
-       var lecture = await _ctx.Lectures.Include(l => l.Students).ThenInclude(s => s.Presences)
-           .Include(l => l.Class)
-           .Include(l => l.Teacher)
-           .Where(l => l.Id == id).FirstOrDefaultAsync();
-       if (lecture != null)
-       {
-           return lecture;
-       }
+        var lecture = await _ctx.Lectures.Include(l => l.Students).ThenInclude(s => s.Presences)
+            .Include(l => l.Class)
+            .Include(l => l.Teacher)
+            .Where(l => l.Id == id).FirstOrDefaultAsync();
+        if (lecture != null) return lecture;
 
-       return null;
+        return null;
     }
+
     // get presences connected to certain lecture
     public async Task<List<Presence>> GetPresencesAsync(int lectureId)
     {
-        var presenceList = _ctx.Presences.Include(l => l.Lecture).Include(p => p.Student).Where(l => l.Lecture.Id == lectureId).ToList();
+        var presenceList = _ctx.Presences.Include(l => l.Lecture).Include(p => p.Student)
+            .Where(l => l.Lecture.Id == lectureId).ToList();
 
-        
 
-        if (presenceList != null)
-        {
-            return presenceList;
-        }
+        if (presenceList != null) return presenceList;
 
         return null;
     }
@@ -156,5 +152,76 @@ public class PresenceHandler
         }
 
         return false;
+    }
+
+    public async Task<Class> GetClass(ulong classId)
+    {
+        return await _ctx.Classes
+            .Where(x => x.Id == classId)
+            .Include(s => s.Students)
+            .FirstOrDefaultAsync();
+    }
+
+
+    //Adds the member from discord to table "Teachers" in database
+    public async Task RegisterTeacherToDatabase(DiscordMember member, Class classToAdd)
+    {
+        var newTeacher = new Teacher
+        {
+            Id = member.Id,
+            Name = member.Nickname ?? member.Username
+        };
+
+        _ctx.Teachers.Add(newTeacher);
+        await _ctx.SaveChangesAsync();
+
+        if (newTeacher.Classes != null) newTeacher.Classes.Add(classToAdd);
+        if (newTeacher.Classes == null)
+            newTeacher.Classes = new List<Class>();
+        newTeacher.Classes.Add(classToAdd);
+
+        await _ctx.SaveChangesAsync();
+    }
+
+    //If the user exists in the table "Teachers" database, return true
+    public async Task<bool> TeacherExists(ulong newTeacherId, Class classToAdd)
+    {
+        var teacher = await _ctx.Teachers
+            .Where(t => t.Id == newTeacherId)
+            .Include(cl => cl.Classes)
+            .FirstOrDefaultAsync();
+
+        if (teacher != null) return teacher.Classes.Any(c => c.Id == classToAdd.Id);
+
+        return false;
+    }
+
+    //If the user exists in the table "Student" database, return true
+    public async Task<bool> StudentExists(ulong newStudentId, Class classToAdd)
+    {
+        var student = await _ctx.Students
+            .Where(s => s.Id == newStudentId)
+            .Include(cl => cl.Classes)
+            .FirstOrDefaultAsync();
+
+        if (student != null) return student.Classes.Any(c => c.Id == classToAdd.Id);
+
+        return false;
+    }
+
+    public async Task RemoveStudentFromClassInDb(ulong newStudentId, Class classToRemoveFrom)
+    {
+        var student = await _ctx.Students
+            .Where(n => n.Id == newStudentId)
+            .FirstAsync();
+
+        var classObj = await _ctx.Classes
+            .Where(x => x.Equals(classToRemoveFrom))
+            .Include(s => s.Students)
+            .FirstAsync();
+
+        classObj.Students.Remove(student);
+
+        await _ctx.SaveChangesAsync();
     }
 }
