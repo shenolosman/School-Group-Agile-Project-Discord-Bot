@@ -31,16 +31,26 @@ public class DbService
             new() { Id = 4,Name = "Hanna"},
             new() { Id = 5,Name = "Natalie"},
             new() { Id = 6,Name = "Jakob"},
-            new() { Id = 7,Name = "Samir"}
+            new() { Id = 7,Name = "Samir"},
+            new() { Id = 8,Name = "Testuser1"},
+            new() { Id = 9,Name = "Testuser2"},
+            new() { Id = 10,Name = "Testuser3"},
+            new() { Id = 11,Name = "Testuser4"},
+            new() { Id = 12,Name = "Testuser5"},
+            new() { Id = 13,Name = "Testuser6"},
+            new() { Id = 14,Name = "Testuser7"},
+            new() { Id = 15,Name = "Testuser8"},
+            new() { Id = 16,Name = "Testuser9"},
+            new() { Id = 17,Name = "Testuser10"},
         };
 
         var studentsClass2 = new List<Student>
         {
-            new() { Id = 8,Name = "Sheki"},
-            new() { Id = 9,Name = "Herman"},
-            new() { Id = 10,Name = "Andreas"},
-            new() { Id = 11,Name = "Dennis"},
-            new() { Id = 12,Name = "Viktor"}
+            new() { Id = 18,Name = "Sheki"},
+            new() { Id = 19,Name = "Herman"},
+            new() { Id = 20,Name = "Andreas"},
+            new() { Id = 21,Name = "Dennis"},
+            new() { Id = 22,Name = "Viktor"}
         };
 
         var lectures = new List<Lecture>
@@ -64,7 +74,17 @@ public class DbService
             new() {Attended = false, Student = students[3], Lecture = lectures[0], ReasonAbsence = "reason 2"},
             new() {Attended = false, Student = students[4], Lecture = lectures[0], ReasonAbsence = null},
             new() {Attended = true, Student = students[5], Lecture = lectures[0], ReasonAbsence = null},
-            new() {Attended = true, Student = students[6], Lecture = lectures[0], ReasonAbsence = null}
+            new() {Attended = true, Student = students[6], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[7], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[8], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[9], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[10], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[11], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[12], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[13], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[14], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[15], Lecture = lectures[0], ReasonAbsence = null},
+            new() {Attended = true, Student = students[16], Lecture = lectures[0], ReasonAbsence = "reason 3"},
         };
 
         var presencesForYesterday = new List<Presence>

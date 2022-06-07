@@ -140,4 +140,26 @@ public class PresenceHandler
 
         return false;
     }
+
+    public async Task<List<Class>> GetAllSchoolclasses()
+    {
+        var schoolClasses = await _ctx.Classes
+            .Include(c => c.Teachers)
+            .Include(c => c.Students)
+            .Include(c => c.Lectures)
+            .ThenInclude(c => c.Presences)
+            .ToListAsync();
+
+        return schoolClasses;
+    }
+    public async Task<List<Teacher>> GetAllTeachers()
+    {
+        var teachers = await _ctx.Teachers
+            .Include(c => c.Classes)
+            .Include(c => c.Lectures)
+            .ThenInclude(l => l.Presences)
+            .ToListAsync();
+
+        return teachers;
+    }
 }
