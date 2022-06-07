@@ -12,6 +12,7 @@ public class StudentCommands : BaseCommandModule
 
     [Command("absence")]
     [Description("Report absence for today's lecture")]
+    [RequireRoles(RoleCheckMode.Any, "Student")]
     public async Task Absence(CommandContext commandCtx)
     {
         await commandCtx.Message.DeleteAsync();
