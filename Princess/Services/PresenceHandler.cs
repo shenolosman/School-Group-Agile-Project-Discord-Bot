@@ -154,7 +154,6 @@ public class PresenceHandler
             .Where(n => n.Id == member.Id)
             .FirstOrDefaultAsync();
 
-        //studenten fanns- ta bort i db
         if (student != null)
         {
             _ctx.Students.Remove(student);
@@ -178,7 +177,7 @@ public class PresenceHandler
         await _ctx.SaveChangesAsync();
     }
 
-    //If the nickname/username exists in the table "Teachers" database, return true
+    //If the user exists in the table "Teachers" database, return true
     public async Task<bool> TeacherExists(ulong newTeacherId, Class classToAdd)
     {
         var teacher = await _ctx.Teachers
@@ -191,6 +190,7 @@ public class PresenceHandler
         return false;
     }
 
+    //If the user exists in the table "Student" database, return true
     public async Task<bool> StudentExists(ulong newStudentId, Class classToAdd)
     {
         var student = await _ctx.Students

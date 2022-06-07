@@ -22,7 +22,7 @@ public class AdminCommands : BaseCommandModule
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
             var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
 
-            //if the member already is teacher
+            //return and send message if the teacher already exists in db
             if (await presenceHandler.TeacherExists(newTeacher.Id, classToAdd))
             {
                 var failedEmbed = new DiscordEmbedBuilder
@@ -47,12 +47,13 @@ public class AdminCommands : BaseCommandModule
 
             var serverRoles = cmdCtx.Guild.Roles;
 
-            //kolla om student och ta bort discord taggen
+            //deletes student role if exists
             if (await presenceHandler.StudentExists(newTeacher.Id, classToAdd))
                 foreach (var role in serverRoles)
                     if (role.Value.Name == "Student")
                         await newTeacher.RevokeRoleAsync(role.Value);
 
+            //sets the teacher role
             foreach (var role in serverRoles)
                 if (role.Value.Name == "Teacher")
                     await newTeacher.GrantRoleAsync(role.Value);
