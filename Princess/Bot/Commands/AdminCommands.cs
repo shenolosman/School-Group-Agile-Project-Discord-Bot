@@ -23,7 +23,7 @@ public class AdminCommands : BaseCommandModule
             var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
 
             //if the member already is teacher
-            if (presenceHandler.TeacherExists(newTeacher.Id, classToAdd).Result)
+            if (await presenceHandler.TeacherExists(newTeacher.Id, classToAdd))
             {
                 var failedEmbed = new DiscordEmbedBuilder
                 {
@@ -48,7 +48,7 @@ public class AdminCommands : BaseCommandModule
             var serverRoles = cmdCtx.Guild.Roles;
 
             //kolla om student och ta bort discord taggen
-            if (presenceHandler.StudentExists(newTeacher.Id, classToAdd).Result)
+            if (await presenceHandler.StudentExists(newTeacher.Id, classToAdd))
                 foreach (var role in serverRoles)
                     if (role.Value.Name == "Student")
                         await newTeacher.RevokeRoleAsync(role.Value);
