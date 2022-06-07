@@ -14,6 +14,8 @@ public class StudentCommands : BaseCommandModule
     [Description("Report absence for today's lecture")]
     public async Task Absence(CommandContext commandCtx)
     {
+        await commandCtx.Message.DeleteAsync();
+
         string input = string.Empty;
 
         var inputStep = new TextStep("If you want to give a reason for your absence, please do so here. Otherwise type: absent", null);
