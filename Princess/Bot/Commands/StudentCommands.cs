@@ -1,32 +1,46 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Princess.Bot.Handlers.Dialogue;
+using Princess.Bot.Handlers.Dialogue.Steps;
 using Princess.Services;
 
 namespace Princess.Bot.Commands;
 
 public class StudentCommands : BaseCommandModule
 {
-    //mitt id är: 879622915346276362
+    //Uses dialogue handler to give reason for absence, for anonymity etc.
 
     [Command("absence")]
-    [Description("Sends absence")]
+    [Description("Report absence for today's lecture")]
     public async Task Absence(CommandContext commandCtx)
     {
+        string input = string.Empty;
+
+        var inputStep = new TextStep("If you want to give a reason for your absence, please do so here. Otherwise type: absent", null);
+
+        inputStep.OnValidResult += (result) => input = result;
+
+        var userChannel = await commandCtx.Member.CreateDmChannelAsync();
+
+        var inputDialogueHandler =
+            new DialogueHandler(commandCtx.Client, userChannel, commandCtx.User, inputStep);
+
+        bool succ = await inputDialogueHandler.ProcessDialogue();
+
+        if (!succ) { return; }
+
         var studentId = commandCtx.User.Id;
-        //beroende på vad som är det unika i databasens nedsparning från discord
+        
         var classId = commandCtx.Guild.Id;
         var date = commandCtx.Message.Timestamp.DateTime;
 
-        //testdata till seed
-        //var studentId = ulong.Parse("10");
-        //var classId = "Win21";
-        //var date = DateTime.Today;
+        userChannel.SendMessageAsync($"You have now reported your absence, reason: {input}");
 
         await using (var scope = commandCtx.Services.CreateAsyncScope())
         {
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
 
-            var succeed = await presenceHandler.RegisterAbsenceForStudent(studentId, classId, date);
+            var succeed = await presenceHandler.RegisterAbsenceForStudent(studentId, classId, date, input);
 
             if (!succeed) await commandCtx.Channel.SendMessageAsync("Sorry! Something went wrong");
             if (succeed)

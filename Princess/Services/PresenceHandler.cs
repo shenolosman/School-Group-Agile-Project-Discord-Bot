@@ -106,21 +106,38 @@ public class PresenceHandler
             x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
     }
 
-    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong channel, DateTime date)
+    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, string? reason)
     {
-        var message = "Registered absence";
+        var message = reason ?? "Absence reported";
 
         var student = _ctx.Students
             .Where(x => x.Id == studentId)
             .FirstOrDefault();
 
         var classget = _ctx.Classes
-            .Where(x => x.Id == channel)
+            .Where(x => x.Id == classId)
             .FirstOrDefault();
 
         var lecture = _ctx.Lectures
             .Where(x => x.Class == classget && x.Date == date)
             .FirstOrDefault();
+
+        if (lecture == null)
+        {
+            var newLecture = new Lecture()
+            {
+                Date = date,
+                Class = classget,
+                Students = classget.Students
+            };
+
+            _ctx.Lectures.Add(newLecture);
+
+            lecture = _ctx.Lectures
+                .Where(x => x.Class == classget && x.Date == date)
+                .FirstOrDefault(); ;
+
+        }
 
         if (lecture != null && student != null && classget != null)
         {
