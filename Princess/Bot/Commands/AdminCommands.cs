@@ -49,9 +49,13 @@ public class AdminCommands : BaseCommandModule
 
             //deletes student role if exists
             if (await presenceHandler.StudentExists(newTeacher.Id, classToAdd))
+            {
                 foreach (var role in serverRoles)
                     if (role.Value.Name == "Student")
                         await newTeacher.RevokeRoleAsync(role.Value);
+
+                await presenceHandler.RemoveStudentFromClassInDb(newTeacher.Id, classToAdd);
+            }
 
             //sets the teacher role
             foreach (var role in serverRoles)

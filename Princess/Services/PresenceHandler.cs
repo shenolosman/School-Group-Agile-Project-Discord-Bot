@@ -149,17 +149,6 @@ public class PresenceHandler
     //Adds the member from discord to table "Teachers" in database
     public async Task RegisterTeacherToDatabase(DiscordMember member, Class classToAdd)
     {
-        var student = await _ctx.Students
-            .Include(x => x.Classes)
-            .Where(n => n.Id == member.Id)
-            .FirstOrDefaultAsync();
-
-        if (student != null)
-        {
-            _ctx.Students.Remove(student);
-            await _ctx.SaveChangesAsync();
-        }
-
         var newTeacher = new Teacher
         {
             Id = member.Id,
@@ -201,5 +190,21 @@ public class PresenceHandler
         if (student != null) return student.Classes.Any(c => c.Id == classToAdd.Id);
 
         return false;
+    }
+
+    public async Task RemoveStudentFromClassInDb(ulong newStudentId, Class classToRemoveFrom)
+    {
+        var student = await _ctx.Students
+            .Where(n => n.Id == newStudentId)
+            .FirstAsync();
+
+        var classObj = await _ctx.Classes
+            .Where(x => x.Equals(classToRemoveFrom))
+            .Include(s => s.Students)
+            .FirstAsync();
+
+        classObj.Students.Remove(student);
+
+        await _ctx.SaveChangesAsync();
     }
 }
