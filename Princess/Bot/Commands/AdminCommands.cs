@@ -20,9 +20,10 @@ public class AdminCommands : BaseCommandModule
         {
             await using var scope = cmdCtx.Services.CreateAsyncScope();
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
+            var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
 
             //if the member already is teacher
-            if (presenceHandler.TeacherExists(newTeacher.Nickname ?? newTeacher.Username).Result)
+            if (presenceHandler.TeacherExists(newTeacher.Id, classToAdd).Result)
             {
                 var failedEmbed = new DiscordEmbedBuilder
                 {
@@ -45,6 +46,13 @@ public class AdminCommands : BaseCommandModule
             }
 
             var serverRoles = cmdCtx.Guild.Roles;
+
+            //kolla om student och ta bort discord taggen
+            if (presenceHandler.StudentExists(newTeacher.Id, classToAdd).Result)
+                foreach (var role in serverRoles)
+                    if (role.Value.Name == "Student")
+                        await newTeacher.RevokeRoleAsync(role.Value);
+
             foreach (var role in serverRoles)
                 if (role.Value.Name == "Teacher")
                     await newTeacher.GrantRoleAsync(role.Value);
@@ -66,7 +74,7 @@ public class AdminCommands : BaseCommandModule
                 Color = DiscordColor.Gold
             };
 
-            await presenceHandler.RegisterTeacherToDatabase(newTeacher);
+            await presenceHandler.RegisterTeacherToDatabase(newTeacher, classToAdd);
 
             await cmdCtx.Message.Channel.SendMessageAsync(newTeacherEmbed);
         }

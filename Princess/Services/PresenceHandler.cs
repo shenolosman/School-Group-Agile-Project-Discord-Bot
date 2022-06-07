@@ -137,25 +137,65 @@ public class PresenceHandler
         return false;
     }
 
-    //Adds the member from discord to table "Teachers" in database
-    public async Task RegisterTeacherToDatabase(DiscordMember member)
+    public async Task<Class> GetClass(ulong classId)
     {
+        return await _ctx.Classes
+            .Where(x => x.Id == classId)
+            .Include(s => s.Students)
+            .FirstOrDefaultAsync();
+    }
+
+
+    //Adds the member from discord to table "Teachers" in database
+    public async Task RegisterTeacherToDatabase(DiscordMember member, Class classToAdd)
+    {
+        var student = await _ctx.Students
+            .Include(x => x.Classes)
+            .Where(n => n.Id == member.Id)
+            .FirstOrDefaultAsync();
+
+        //studenten fanns- ta bort i db
+        if (student != null)
+        {
+            _ctx.Students.Remove(student);
+            await _ctx.SaveChangesAsync();
+        }
+
         var newTeacher = new Teacher
         {
             Id = member.Id,
             Name = member.Nickname ?? member.Username
         };
+
         _ctx.Teachers.Add(newTeacher);
+        await _ctx.SaveChangesAsync();
+
+        if (newTeacher.Classes != null) newTeacher.Classes.Add(classToAdd);
+        if (newTeacher.Classes == null)
+            newTeacher.Classes = new List<Class>();
+        newTeacher.Classes.Add(classToAdd);
+
         await _ctx.SaveChangesAsync();
     }
 
     //If the nickname/username exists in the table "Teachers" database, return true
-    public async Task<bool> TeacherExists(string name)
+    public async Task<bool> TeacherExists(ulong newTeacherId, Class classToAdd)
     {
         var teacher = await _ctx.Teachers
-            .Where(n => n.Name == name)
+            .Where(t => t.Id == newTeacherId)
+            .Include(cl => cl.Classes)
             .FirstOrDefaultAsync();
 
-        return teacher != null;
+        return teacher.Classes.Any(c => c.Id == classToAdd.Id);
+    }
+
+    public async Task<bool> StudentExists(ulong newStudentId, Class classToAdd)
+    {
+        var student = await _ctx.Students
+            .Where(s => s.Id == newStudentId)
+            .Include(cl => cl.Classes)
+            .FirstOrDefaultAsync();
+
+        return student.Classes.Any(c => c.Id == classToAdd.Id);
     }
 }
