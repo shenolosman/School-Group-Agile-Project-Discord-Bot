@@ -186,7 +186,9 @@ public class PresenceHandler
             .Include(cl => cl.Classes)
             .FirstOrDefaultAsync();
 
-        return teacher.Classes.Any(c => c.Id == classToAdd.Id);
+        if (teacher != null) return teacher.Classes.Any(c => c.Id == classToAdd.Id);
+
+        return false;
     }
 
     public async Task<bool> StudentExists(ulong newStudentId, Class classToAdd)
@@ -196,6 +198,8 @@ public class PresenceHandler
             .Include(cl => cl.Classes)
             .FirstOrDefaultAsync();
 
-        return student.Classes.Any(c => c.Id == classToAdd.Id);
+        if (student != null) return student.Classes.Any(c => c.Id == classToAdd.Id);
+
+        return false;
     }
 }
