@@ -148,6 +148,7 @@ public class PresenceHandler
 
         return schoolClasses;
     }
+
     public async Task<List<Teacher>> GetAllTeachers()
     {
         var teachers = await _ctx.Teachers
@@ -157,6 +158,7 @@ public class PresenceHandler
             .ToListAsync();
 
         return teachers;
+    }
 
     public async Task<Class> GetClass(ulong classId)
     {
