@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbService>();
 builder.Services.AddScoped<PresenceHandler>();
 
@@ -36,9 +37,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     "default",
     "{controller=Home}/{action=Index}/{id?}");
-app.MapControllerRoute(
-    "Lecture",
-    "{controller=Home}/{action=Lecture}/{id}");
+
+app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
