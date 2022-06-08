@@ -1,15 +1,11 @@
-﻿using System.Net.Http.Headers;
-using System.Web;
+﻿using System.Web;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
-using Newtonsoft.Json;
 using Princess.Bot.Services;
-using Princess.Data;
 using Princess.Models;
-using Princess.Services;
 
 namespace Princess.Bot.Commands
 {
@@ -23,6 +19,8 @@ namespace Princess.Bot.Commands
         public async Task PresenceQuiz(CommandContext cmdCtx,
             [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
         {
+            await cmdCtx.Message.DeleteAsync();
+
             var discordGuildRoles = cmdCtx.Guild.Roles;
 
             var guildRoles = discordGuildRoles.ToList();
@@ -42,11 +40,7 @@ namespace Princess.Bot.Commands
                 try
                 {
                     // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
-                    await cmdCtx.Guild.CreateRoleAsync("Student",
-                        Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles |
-                        Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels,
-                        DiscordColor.CornflowerBlue, null, true,
-                        "This role is needed to send a presence check to all students in guild");
+                    await cmdCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, true, true, "This role is needed to send a presence check to all students in guild");
                 }
                 catch (Exception e)
                 {
@@ -66,11 +60,14 @@ namespace Princess.Bot.Commands
             else
                 mentionStudent = "Students";
 
-
-            /*    var dmEmbed = new DiscordEmbedBuilder
+      
+            var dmEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
-                Description = $"Your teacher in \"{cmdCtx.Guild.Name}\" has made an presence-check in the <#{cmdCtx.Channel.Id}> channel. You have 15 minutes to thumb up that message, otherwise you will be set as absent to that lecture",
+                Description = $"Your teacher in \"{cmdCtx.Guild.Name}\" has made an presence-check in" +
+                              $" the <#{cmdCtx.Channel.Id}> channel. You have {reactionDuration.Minutes} " +
+                              $"minutes and {reactionDuration.Seconds} seconds to answer that message" +
+                              $", otherwise you will be set as absent to that lecture",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = cmdCtx.User.AvatarUrl,
@@ -84,20 +81,32 @@ namespace Princess.Bot.Commands
                 Color = DiscordColor.Gold,
             };
 
-            // This is the part where all who is active on channel gets a DM that an presence-check is started. Doesnt work as intented yet.
-            foreach (var user in cmdCtx.Channel.Users)
+            // Sends a DM to all users with the student role when presence is called
+            var allMembersIcol = await cmdCtx.Guild.GetAllMembersAsync();
+            var allMembers = new List<DiscordMember>(allMembersIcol);
+            foreach (var user in allMembers)
             {
+
                 try
                 {
-                    if (!user.IsBot)
-                        await user.SendMessageAsync(embed: dmEmbed);
+                    bool isStudent = false;
+
+                    foreach (var role in user.Roles)
+                    {
+                        if (role.Name == "Student")
+                        {
+                            await user.SendMessageAsync(embed: dmEmbed);
+                        }
+                    }
+
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     throw;
                 }
-            }*/
+            }
+
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
@@ -167,7 +176,14 @@ namespace Princess.Bot.Commands
                 await quizMessage.CreateReactionAsync(answerThree);
                 await quizMessage.CreateReactionAsync(answerFour);
 
-                // Working with interactivity
+                // Creates a dictionary to save emoji to the right answer
+                var answerByEmoji = new Dictionary<string, string>();
+
+                answerByEmoji.Add(mixedAnswers[0], answerOne);
+                answerByEmoji.Add(mixedAnswers[1], answerTwo);
+                answerByEmoji.Add(mixedAnswers[2], answerThree);
+                answerByEmoji.Add(mixedAnswers[3], answerFour);
+
                 var interactivity = cmdCtx.Client.GetInteractivity();
 
                 var quizAnswers = await interactivity.CollectReactionsAsync(quizMessage, reactionDuration);
@@ -188,7 +204,7 @@ namespace Princess.Bot.Commands
                         {
                             if (answer.Emoji == answerOne)
                             {
-                                if (user != null) 
+                                if (user != null)
                                 {
                                     totalFirstAnswers++;
                                 }
@@ -221,88 +237,91 @@ namespace Princess.Bot.Commands
                     }
                 }
 
+                var totalAnswerResult = new Dictionary<string, int>();
+
+                totalAnswerResult.Add(mixedAnswers[0], totalFirstAnswers);
+                totalAnswerResult.Add(mixedAnswers[1], totalSecondAnswers);
+                totalAnswerResult.Add(mixedAnswers[2], totalThirdAnswers);
+                totalAnswerResult.Add(mixedAnswers[3], totalFourthAnswers);
+
+
                 // Collects all answers in a list, just one answer per user
-                var containsEmojis = quizAnswers.Any(x => 
-                    x.Emoji == answerOne || x.Emoji == answerTwo || 
+                var containsEmojis = quizAnswers.Any(x =>
+                    x.Emoji == answerOne || x.Emoji == answerTwo ||
                     x.Emoji == answerThree || x.Emoji == answerFour);
 
-                    foreach (var result in quizAnswers)
-                    {
-                        var isBot = result.Users.Any(x => x.IsBot); 
+                foreach (var result in quizAnswers)
+                {
+                    var isBot = result.Users.Any(x => x.IsBot);
 
-                        if (!isBot) 
-                        { 
-                            if (containsEmojis) 
+                    if (!isBot)
+                    {
+                        if (containsEmojis)
+                        {
+                            foreach (var user in result.Users)
                             {
-                                foreach (var user in result.Users) 
-                                { 
-                                    if (!anyoneWhoReacted.Contains(user)) anyoneWhoReacted.Add(user);
-                                }
+                                if (!anyoneWhoReacted.Contains(user)) anyoneWhoReacted.Add(user);
                             }
                         }
                     }
+                }
 
-                    // Prints out the total answers result 
-                    if (totalFirstAnswers > 0 || totalSecondAnswers > 0 ||
-                        totalThirdAnswers > 0 ||
-                        totalFourthAnswers > 0)
+                var correctEmoji = String.Empty;
+
+                foreach (var keyValue in answerByEmoji)
+                {
+                    if (keyValue.Key == triviaQuizList[0].CorrectAnswer) correctEmoji = keyValue.Value;
+                }
+
+                var sumOfCorrectAnswers = 0;
+
+                foreach (var keyValue in totalAnswerResult)
+                {
+                    if (keyValue.Key == triviaQuizList[0].CorrectAnswer) sumOfCorrectAnswers = keyValue.Value;
+                }
+
+                var quizResultEmbed = new DiscordEmbedBuilder
+                {
+                    Title = $"\nQuestion: {decodedQuestion}",
+                    Description = $"The correct answer: {correctEmoji} {decodedCorrectAnswer}\n" +
+                                  $"Amount of correct answers: {sumOfCorrectAnswers}",
+                    Color = DiscordColor.Gold,
+                };
+
+                await cmdCtx.Channel.SendMessageAsync(embed: quizResultEmbed);
+
+                var teacherDm = new DiscordEmbedBuilder
+                {
+                    Title = "Gathered Presence Check Info",
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
-
-                        await cmdCtx.Channel.SendMessageAsync($"Result of the question:");
-                        await cmdCtx.Channel.SendMessageAsync($":one: {totalFirstAnswers}");
-                        await cmdCtx.Channel.SendMessageAsync($":two: {totalSecondAnswers}");
-                        await cmdCtx.Channel.SendMessageAsync($":three: {totalThirdAnswers}");
-                        await cmdCtx.Channel.SendMessageAsync($":four: {totalFourthAnswers}");
-
-                        foreach (var user in anyoneWhoReacted)
-                        {
-                            var member = cmdCtx.Guild.Members.Values.Where(x => x.Id == user.Id).FirstOrDefault();
-                            var username = member.Nickname ?? user.Username;
-
-                            await cmdCtx.Channel.SendMessageAsync(string.Join("\n", username));
-                        }
-
-                        await cmdCtx.Channel.SendMessageAsync(
-                            $"The correct answer: {triviaQuizList[0].CorrectAnswer}");
-                    }
-                    else
+                        IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
+                        Name = cmdCtx.Client.CurrentUser.Username,
+                    },
+                    Color = DiscordColor.Gold,
+                    Description = $"Here is the gathered info from the presence-check you made" +
+                                  $" in {cmdCtx.Channel.Mention}.\nPresent: {anyoneWhoReacted.Count}\nAbsent: XX\n" +
+                                  $"Total students in {cmdCtx.Guild.Name}: XX\n" +
+                                  $"To see further information and to be able to export the presence-check use this link:\n",
+                    Timestamp = cmdCtx.Message.Timestamp,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
                     {
-                        await cmdCtx.Channel.SendMessageAsync($"None answered... None is present today!");
-                        await cmdCtx.Channel.SendMessageAsync(
-                            $"The correct answer: {triviaQuizList[0].CorrectAnswer}");
-                    }
+                        Url = cmdCtx.Client.CurrentUser.AvatarUrl,
+                    },
+                   // Url = $@"https://localhost:8000/Home/Lecture/{lecture.Id}",
 
-                    /*     var teacherDm = new DiscordEmbedBuilder
-                    {
-                        Title = "Gathered Presence Check Info",
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
-                        {
-                            IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
-                            Name = cmdCtx.Client.CurrentUser.Username,
-                        },
-                        Color = DiscordColor.Gold,
-                        Description = $"Here is the gathered info from the presence-check you made in {cmdCtx.Channel.Mention}.\nPresent: {everyOnesReaction.Count}\nAbsent: XX\nTotal students in {cmdCtx.Guild.Name}: XX\nTo see further information and to be able to export the presence-check use this link:\n https://localhost:8000",
-                        Timestamp = cmdCtx.Message.Timestamp,
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
-                        {
-                            Url = cmdCtx.Client.CurrentUser.AvatarUrl,
-                        },
-                        Url = "https://localhost:8000",
-                    };
-    
-                    try
-                    {
-    
-                        await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }*/
+                }; 
+                try 
+                {
+                    await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
-
 
         [Command("PresenceCheck")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. Students react with an thumbs up Emoji and you will get who was present.")]
