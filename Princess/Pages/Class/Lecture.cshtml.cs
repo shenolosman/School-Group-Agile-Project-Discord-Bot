@@ -27,7 +27,6 @@ namespace Princess.Pages.Class
         public List<Student> Students { get; set; }
 
 
-
         public async Task OnGetAsync()
         {
             Students = await GetPaginatedResult(LectureId, CurrentPage, PageSize);
