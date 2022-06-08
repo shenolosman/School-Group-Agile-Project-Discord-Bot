@@ -103,6 +103,7 @@ namespace Princess.Bot.Commands
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
                 var triviaQuizList = await triviaQuestions.GetAttendanceQuestions();
 
+                // Html Decode
                 string question = triviaQuizList[0].QuestionString; // [0] first item in the TriviaQuizList
                 string correctAnswer = triviaQuizList[0].CorrectAnswer;
                 string incorrectAnswerOne = triviaQuizList[0].IncorrectAnswers[0];
@@ -122,14 +123,14 @@ namespace Princess.Bot.Commands
                     decodedIncorrectAnswerThree
                 };
 
+                // Uses the list above and then makes the answers random
                 Random rng = new Random();
                 var mixedAnswers = correctAndIncorrectAnswers.OrderBy(a => rng.Next()).ToList();
 
                 var decodedQuizEmbed = new DiscordEmbedBuilder
                 {
                     Title = $"\n{decodedQuestion} ",
-                    Description = $"\n "+
-                                  $"1. {mixedAnswers[0]}\n " +
+                    Description = $"1. {mixedAnswers[0]}\n " +
                                   $"2. {mixedAnswers[1]}\n " +
                                   $"3. {mixedAnswers[2]}\n " +
                                   $"4. {mixedAnswers[3]}",
@@ -178,7 +179,7 @@ namespace Princess.Bot.Commands
                 int totalThirdAnswers = 0;
                 int totalFourthAnswers = 0;
 
-
+                // Loops through all emoji-reaction answers
                 foreach (var answer in quizAnswers)
                 {
                     foreach (var user in answer.Users)
@@ -220,7 +221,7 @@ namespace Princess.Bot.Commands
                     }
                 }
 
-                // Collecting all answers in a list, just one answer per user
+                // Collects all answers in a list, just one answer per user
                 var containsEmojis = quizAnswers.Any(x => 
                     x.Emoji == answerOne || x.Emoji == answerTwo || 
                     x.Emoji == answerThree || x.Emoji == answerFour);
@@ -241,6 +242,7 @@ namespace Princess.Bot.Commands
                         }
                     }
 
+                    // Prints out the total answers result 
                     if (totalFirstAnswers > 0 || totalSecondAnswers > 0 ||
                         totalThirdAnswers > 0 ||
                         totalFourthAnswers > 0)
@@ -251,7 +253,6 @@ namespace Princess.Bot.Commands
                         await cmdCtx.Channel.SendMessageAsync($":two: {totalSecondAnswers}");
                         await cmdCtx.Channel.SendMessageAsync($":three: {totalThirdAnswers}");
                         await cmdCtx.Channel.SendMessageAsync($":four: {totalFourthAnswers}");
-
 
                         foreach (var user in anyoneWhoReacted)
                         {
