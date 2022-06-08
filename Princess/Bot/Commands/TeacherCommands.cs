@@ -138,7 +138,7 @@ namespace Princess.Bot.Commands
 
                 var decodedQuizEmbed = new DiscordEmbedBuilder
                 {
-                    Title = $"\n{decodedQuestion} ",
+                    Title = $"\n{decodedQuestion}",
                     Description = $"1. {mixedAnswers[0]}\n " +
                                   $"2. {mixedAnswers[1]}\n " +
                                   $"3. {mixedAnswers[2]}\n " +
@@ -270,14 +270,14 @@ namespace Princess.Bot.Commands
 
                 foreach (var keyValue in answerByEmoji)
                 {
-                    if (keyValue.Key == triviaQuizList[0].CorrectAnswer) correctEmoji = keyValue.Value;
+                    if (keyValue.Key == decodedCorrectAnswer) correctEmoji = keyValue.Value;
                 }
 
                 var sumOfCorrectAnswers = 0;
 
                 foreach (var keyValue in totalAnswerResult)
                 {
-                    if (keyValue.Key == triviaQuizList[0].CorrectAnswer) sumOfCorrectAnswers = keyValue.Value;
+                    if (keyValue.Key == decodedCorrectAnswer) sumOfCorrectAnswers = keyValue.Value;
                 }
 
                 var quizResultEmbed = new DiscordEmbedBuilder
