@@ -1,0 +1,86 @@
+﻿@page "{LectureId:Int}"
+@using Princess.Services
+@model Princess.Pages.Class.LectureModel
+
+@inject PresenceHandler _presenceHandler
+@{
+    ViewData["Title"] = "Home Page";
+    ViewData["Header-title"] = "Pr3s3nc3 Overview";
+
+    int lectureId = Model.LectureId;
+
+    var lecture = await _presenceHandler.GetLectureAsync(lectureId);
+    var presenceList = lecture.Presences;
+    var allSchoolClasses = await _presenceHandler.GetAllSchoolclasses();
+    var teachers = await _presenceHandler.GetAllTeachers();
+    
+}
+<br/>
+<div class="dropdown d-flex me-auto">
+    @*Right now nothing changes when choosing a different teacher, this is only layout. In Future when you click a teacher in dropdown, show only the classes that the teacher has in the 
+        Schoolclass dropdown
+    *@
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuTeacherLink" data-bs-toggle="dropdown" aria-expanded="false">
+        Teacher: @lecture.Teacher.Name
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuTeacherLink">
+        @foreach (var teacher in teachers)
+        {
+            <li><a class="dropdown-item" href="#">@teacher.Name</a></li>
+        }
+    </ul>
+    <a class="btn btn-secondary dropdown-toggle ms-2" href="#" role="button" id="dropdownMenuSchoolclassLink" data-bs-toggle="dropdown" aria-expanded="false">
+        Class: @lecture.Class.Name
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuSchoolclassLink">
+        @foreach (var schoolClass in allSchoolClasses)
+        {
+            <li><a class="dropdown-item" href="#">@schoolClass.Name</a></li>
+        }
+    </ul>
+    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
+</div>
+<div class="ms-auto">
+    
+</div>
+
+
+<table class="table header-table">
+    <thead>
+    <tr>
+        @*<th class="tdSize" scope="col">Class</th>
+        <th class="tdSize" scope="col">Teacher</th>*@
+        <th class="tdSize" scope="col">Student</th>
+        <th class="tdSize" scope="col">Date | Time</th>
+        <th class="tdSize" scope="col">Present</th>
+        <th class="tdSize" scope="col">Reason for absence</th>
+    </tr>
+    </thead>
+</table>
+@foreach (var student in Model.Students)
+{
+    var presence = presenceList.FirstOrDefault(p => p.Student == student);
+
+    <table class="table bg-table ctx-table">
+        <tbody>
+        <tr>
+            @*<td class="tdSize" scope="row">@lecture.Class.Name</td>
+            <td class="tdSize">@lecture.Teacher.Name</td>*@
+            <td class="tdSize">@student.Name</td>
+            <td class="tdSize">@lecture.Date.ToShortDateString(), @lecture.Date.ToShortTimeString()</td>
+            <td class="tdSize">@Html.CheckBoxFor(x => @presence.Attended, new {@disabled = "disabled"} )</td>
+            <td class="tdSize">@presence.ReasonAbsence</td>
+        </tr>
+        </tbody>
+    </table>
+}
+<div>
+    <ul class="pagination">
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a asp-page="/Class/Lecture" asp-route-CurrentPage="@i" asp-route-LectureId="@Model.LectureId"class="page-link">@i</a>
+            </li>
+        }
+    </ul>
+</div>
