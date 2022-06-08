@@ -17,6 +17,7 @@ body {
     margin-bottom: 60px;
     background-color: #32485C;
     color: aliceblue
+           
 }
 
 .bg-greenBlack {
@@ -29,7 +30,7 @@ body {
     color: #d4ebd8 !important;
 }
 .nav-text {
-    color: #374d60 !important;
+    color: rgba(50, 72, 92, 1) !important;
 }
 .navbar {
     border: none !important;
@@ -86,6 +87,10 @@ body {
         border-color: #dee2e6;
     }
 input#student_Attended {
+    width: 23px;
+    height: 23px;
+}
+input#presence_Attended {
     width: 23px;
     height: 23px;
 }
