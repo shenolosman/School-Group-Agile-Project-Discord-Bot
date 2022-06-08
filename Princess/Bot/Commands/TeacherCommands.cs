@@ -183,35 +183,38 @@ namespace Princess.Bot.Commands
                 {
                     foreach (var user in answer.Users)
                     {
-                        if (answer.Emoji == answerOne)
+                        if (!user.IsBot)
                         {
-                            if (user != null && !user.IsBot)
+                            if (answer.Emoji == answerOne)
                             {
-                                totalFirstAnswers++;
+                                if (user != null) 
+                                {
+                                    totalFirstAnswers++;
+                                }
                             }
-                        }
 
-                        if (answer.Emoji == answerTwo)
-                        {
-                            if (user != null && !user.IsBot)
+                            if (answer.Emoji == answerTwo)
                             {
-                                totalSecondAnswers++;
+                                if (user != null)
+                                {
+                                    totalSecondAnswers++;
+                                }
                             }
-                        }
 
-                        if (answer.Emoji == answerThree)
-                        {
-                            if (user != null && !user.IsBot)
+                            if (answer.Emoji == answerThree)
                             {
-                                totalThirdAnswers++;
+                                if (user != null)
+                                {
+                                    totalThirdAnswers++;
+                                }
                             }
-                        }
 
-                        if (answer.Emoji == answerFour)
-                        {
-                            if (user != null && !user.IsBot)
+                            if (answer.Emoji == answerFour)
                             {
-                                totalFourthAnswers++;
+                                if (user != null)
+                                {
+                                    totalFourthAnswers++;
+                                }
                             }
                         }
                     }
@@ -224,13 +227,16 @@ namespace Princess.Bot.Commands
 
                     foreach (var result in quizAnswers)
                     {
-                        if (containsEmojis)
-                        {
-                            var isBot = result.Users.Any(x => x.IsBot);
+                        var isBot = result.Users.Any(x => x.IsBot); 
 
-                            foreach (var user in result.Users)
+                        if (!isBot) 
+                        { 
+                            if (containsEmojis) 
                             {
-                                if (!isBot && !anyoneWhoReacted.Contains(user)) anyoneWhoReacted.Add(user);
+                                foreach (var user in result.Users) 
+                                { 
+                                    if (!anyoneWhoReacted.Contains(user)) anyoneWhoReacted.Add(user);
+                                }
                             }
                         }
                     }
