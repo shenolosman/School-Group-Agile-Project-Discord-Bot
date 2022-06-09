@@ -6,11 +6,50 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
 using Princess.Bot.Services;
 using Princess.Models;
+using Princess.Services;
 
 namespace Princess.Bot.Commands
 {
     public class TeacherCommands : BaseCommandModule
     {
+     
+        private async Task RegisterStudents(CommandContext cmdCtx, List<DiscordMember> allMembers)
+        {
+            
+            var studentsDiscord = allMembers;
+
+
+            await using (var scope = cmdCtx.Services.CreateAsyncScope())
+            {
+                var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
+                var teacherRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Teacher");
+                var studentRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Student");
+
+                foreach (var student in studentsDiscord)
+                {
+                    if (!student.Roles.Contains(teacherRole.Value) && !student.IsBot)
+                    {
+
+                       await student.GrantRoleAsync(studentRole.Value);
+
+                        if (await presenceHandler.StudentExists(student.Id))
+                        {
+                            await presenceHandler.RegisterToClass(student.Id, cmdCtx.Guild.Id);
+
+                        }
+
+                        else
+                        {
+                            await presenceHandler.RegisterStudent(student.Nickname ?? student.Username, student.Id, cmdCtx.Guild.Id);
+                        }
+                    }
+                   
+                }
+                
+            }
+
+            
+        }
 
         [Command("presenceQuiz")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
@@ -20,6 +59,11 @@ namespace Princess.Bot.Commands
             [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
         {
             await cmdCtx.Message.DeleteAsync();
+
+            var allMembersIcol = await cmdCtx.Guild.GetAllMembersAsync();
+            var allMembers = new List<DiscordMember>(allMembersIcol);
+
+            await RegisterStudents(cmdCtx, allMembers);
 
             var discordGuildRoles = cmdCtx.Guild.Roles;
 
@@ -54,8 +98,7 @@ namespace Princess.Bot.Commands
             };
 
             // Sends a DM to all users with the student role when presence is called
-            var allMembersIcol = await cmdCtx.Guild.GetAllMembersAsync();
-            var allMembers = new List<DiscordMember>(allMembersIcol);
+           
             foreach (var user in allMembers)
             {
 
@@ -82,6 +125,7 @@ namespace Princess.Bot.Commands
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
+                var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
                 var triviaQuizItem = await triviaQuestions.GetAttendanceQuestions();
 
                 // Html Decode
@@ -167,6 +211,8 @@ namespace Princess.Bot.Commands
                 int totalThirdAnswers = 0;
                 int totalFourthAnswers = 0;
 
+                var schoolClass = await presenceHandler.GetClass(cmdCtx.Guild.Id);
+                var absentStudents = schoolClass.Students.ToList();
                 // Loops through all emoji-reaction answers
                 foreach (var answer in quizAnswers)
                 {
@@ -177,6 +223,7 @@ namespace Princess.Bot.Commands
                             if (answer.Emoji == answerOne)
                             {
                                 totalFirstAnswers++;
+                               
                             }
 
                             if (answer.Emoji == answerTwo)
@@ -193,8 +240,22 @@ namespace Princess.Bot.Commands
                             {
                                 totalFourthAnswers++;
                             }
+
+                            var student = absentStudents.FirstOrDefault(s => s.Id == user.Id);
+                            if (student != null)
+                            {
+                                absentStudents.Remove(student);
+                                await presenceHandler.RegisterPresence(student.Id, cmdCtx.Guild.Id, DateTime.Today);
+                            }
+
+                           
                         }
                     }
+                }
+
+                foreach (var student in absentStudents)
+                {
+                    await presenceHandler.RegisterAbsenceForStudent(student.Id, cmdCtx.Guild.Id, DateTime.Today);
                 }
 
                 var totalAnswerResult = new Dictionary<string, int>();

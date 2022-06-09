@@ -14,6 +14,37 @@ public class PresenceHandler
         _ctx = ctx;
     }
 
+    public async Task RegisterToClass(ulong studentId, ulong classId)
+    {
+        var schoolClass = await GetClass(classId);
+        var student = await _ctx.Students
+            .Include(s => s.Classes)
+            .FirstOrDefaultAsync(s => s.Id == studentId);
+
+        student.Classes.Add(schoolClass);
+
+        await _ctx.SaveChangesAsync();
+    }
+    public async Task RegisterStudent(string name, ulong id, ulong classId)
+    {
+        var schoolClass = await GetClass(classId);
+
+        var student = new Student()
+        {
+            Id = id,
+            Name = name,
+            Classes = new List<Class>()
+            {
+                schoolClass
+            },
+            Presences = new List<Presence>(),
+            Lectures = new List<Lecture>()
+        };
+
+        await _ctx.Students.AddAsync(student);
+        await _ctx.SaveChangesAsync();
+    }
+
     // returns a lecture with the given id. Includes class, student, the student's precenses adn teh teacher.
     // Make sure to match the precens' id with the lecture.
     public async Task<Lecture> GetLectureAsync(int id)
@@ -38,6 +69,7 @@ public class PresenceHandler
 
         return null;
     }
+    
 
     public async Task<List<Presence>> GetAllAttendees(DateTime date, string selectedClass, string selectedTeacher)
     {
@@ -102,7 +134,7 @@ public class PresenceHandler
             x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
     }
 
-    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, string? reason)
+    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, string? reason = null)
     {
         var message = reason ?? "Absence reported";
 
@@ -218,6 +250,17 @@ public class PresenceHandler
         return false;
     }
 
+    public async Task<bool> StudentExists(ulong newStudentId)
+    {
+        var student = await _ctx.Students
+            .Where(s => s.Id == newStudentId)
+            
+            .FirstOrDefaultAsync();
+
+        if (student != null) return true;
+
+        return false;
+    }
     //If the user exists in the table "Student" database, return true
     public async Task<bool> StudentExists(ulong newStudentId, Class classToAdd)
     {
@@ -245,5 +288,53 @@ public class PresenceHandler
         classObj.Students.Remove(student);
 
         await _ctx.SaveChangesAsync();
+    }
+
+    public async Task RegisterPresence(ulong studentId, ulong classId, DateTime date, string? reason = null)
+    {
+        var student = await _ctx.Students
+            .Include(s => s.Lectures)
+            .Include(s => s.Presences)
+            .FirstOrDefaultAsync(s => s.Id == studentId);
+
+        var classget = _ctx.Classes
+            .Where(x => x.Id == classId)
+            .FirstOrDefault();
+
+        var lecture = _ctx.Lectures
+            .Where(x => x.Class == classget && x.Date == date)
+            .FirstOrDefault();
+
+        if (lecture == null)
+        {
+            var newLecture = new Lecture()
+            {
+                Date = date,
+                Class = classget,
+                Students = classget.Students
+            };
+
+            _ctx.Lectures.Add(newLecture);
+
+            lecture = _ctx.Lectures
+                .Where(x => x.Class == classget && x.Date == date)
+                .FirstOrDefault(); ;
+
+            if (lecture != null && student != null && classget != null)
+            {
+                var presence = new Presence
+                {
+                    Attended = false,
+                    ReasonAbsence = reason,
+                    Student = student,
+                    Lecture = lecture
+                };
+
+                _ctx.Presences.Add(presence);
+
+                await _ctx.SaveChangesAsync();
+                
+            }
+        }
     }
 }
