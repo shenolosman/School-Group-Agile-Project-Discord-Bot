@@ -82,14 +82,14 @@ namespace Princess.Bot.Commands
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
                 var triviaQuestions = scope.ServiceProvider.GetRequiredService<TriviaQuestions>();
-                var triviaQuizList = await triviaQuestions.GetAttendanceQuestions();
+                var triviaQuizItem = await triviaQuestions.GetAttendanceQuestions();
 
                 // Html Decode
-                string question = triviaQuizList[0].QuestionString; // [0] first item in the TriviaQuizList
-                string correctAnswer = triviaQuizList[0].CorrectAnswer;
-                string incorrectAnswerOne = triviaQuizList[0].IncorrectAnswers[0];
-                string incorrectAnswerTwo = triviaQuizList[0].IncorrectAnswers[1];
-                string incorrectAnswerThree = triviaQuizList[0].IncorrectAnswers[2];
+                string question = triviaQuizItem.QuestionString; 
+                string correctAnswer = triviaQuizItem.CorrectAnswer;
+                string incorrectAnswerOne = triviaQuizItem.IncorrectAnswers[0];
+                string incorrectAnswerTwo = triviaQuizItem.IncorrectAnswers[1];
+                string incorrectAnswerThree = triviaQuizItem.IncorrectAnswers[2];
 
                 string decodedQuestion = HttpUtility.HtmlDecode(question);
                 string decodedCorrectAnswer = HttpUtility.HtmlDecode(correctAnswer);
@@ -128,7 +128,7 @@ namespace Princess.Bot.Commands
                     },
                     Footer = new DiscordEmbedBuilder.EmbedFooter()
                     {
-                        Text = $"Category: {triviaQuizList[0].Category}, Difficulty: {triviaQuizList[0].Difficulty}"
+                        Text = $"Category: {triviaQuizItem.Category}, Difficulty: {triviaQuizItem.Difficulty}"
                     },
                     Color = DiscordColor.Gold,
                 };
@@ -172,38 +172,26 @@ namespace Princess.Bot.Commands
                 {
                     foreach (var user in answer.Users)
                     {
-                        if (!user.IsBot)
+                        if (!user.IsBot && user != null)
                         {
                             if (answer.Emoji == answerOne)
                             {
-                                if (user != null)
-                                {
-                                    totalFirstAnswers++;
-                                }
+                                totalFirstAnswers++;
                             }
 
                             if (answer.Emoji == answerTwo)
                             {
-                                if (user != null)
-                                {
-                                    totalSecondAnswers++;
-                                }
+                                totalSecondAnswers++;
                             }
 
                             if (answer.Emoji == answerThree)
                             {
-                                if (user != null)
-                                {
-                                    totalThirdAnswers++;
-                                }
+                                totalThirdAnswers++;
                             }
 
                             if (answer.Emoji == answerFour)
                             {
-                                if (user != null)
-                                {
-                                    totalFourthAnswers++;
-                                }
+                                totalFourthAnswers++;
                             }
                         }
                     }

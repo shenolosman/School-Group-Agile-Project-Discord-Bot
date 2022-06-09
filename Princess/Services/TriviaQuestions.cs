@@ -5,14 +5,14 @@ namespace Princess.Bot.Services
 {
     public class TriviaQuestions
     {
-        public async Task<List<DTOs.Question>> GetAttendanceQuestions()
+        public async Task<DTOs.Question> GetAttendanceQuestions()
         {
-            //Url:https://opentdb.com/api.php?amount=10
+            //Url:https://opentdb.com/api.php?amount=1&type=multiple
 
-            var questions = new List<DTOs.Question>();
+            var question = new DTOs.Question();
 
             var url = $"https://opentdb.com/api.php";
-            var parameters = $"?&amount=10";
+            var parameters = $"?&amount=1&type=multiple";
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(url);
@@ -23,15 +23,13 @@ namespace Princess.Bot.Services
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var questionList = JsonConvert.DeserializeObject<DTOs.Questions>(jsonString);
+                var questionItem = JsonConvert.DeserializeObject<DTOs.Questions>(jsonString).QuestionList.First();
 
-                if (questionList != null)
-                {
-                    questions.AddRange(questionList.QuestionList);
-                }
-
+                question = questionItem;
             }
-            return questions.ToList();
+
+            return question;
+
         }
     }
 }
