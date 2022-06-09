@@ -23,34 +23,6 @@ namespace Princess.Bot.Commands
 
             var discordGuildRoles = cmdCtx.Guild.Roles;
 
-            var guildRoles = discordGuildRoles.ToList();
-
-            bool studentRoleExists = false;
-            foreach (var role in guildRoles)
-            {
-                if (role.Value.Name.ToLower() == "student")
-                {
-                    studentRoleExists = true;
-                    break;
-                }
-            }
-
-            if (!studentRoleExists)
-            {
-                try
-                {
-                    // Add or Delete Permissions as done in the params below if needed. This will change permissions for the "student-role" When and if its created.
-                    await cmdCtx.Guild.CreateRoleAsync("Student", Permissions.SendMessages | Permissions.ChangeNickname | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream | Permissions.UseVoice | Permissions.AccessChannels, DiscordColor.CornflowerBlue, true, true, "This role is needed to send a presence check to all students in guild");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-            }
-
-            discordGuildRoles = cmdCtx.Guild.Roles;
-
             var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
 
             string mentionStudent = "";
