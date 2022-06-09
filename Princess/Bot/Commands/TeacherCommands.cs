@@ -139,10 +139,10 @@ namespace Princess.Bot.Commands
                 var decodedQuizEmbed = new DiscordEmbedBuilder
                 {
                     Title = $"\n{decodedQuestion}",
-                    Description = $"1. {mixedAnswers[0]}\n " +
-                                  $"2. {mixedAnswers[1]}\n " +
-                                  $"3. {mixedAnswers[2]}\n " +
-                                  $"4. {mixedAnswers[3]}",
+                    Description = $":one: {mixedAnswers[0]}\n\n" +
+                                  $":two: {mixedAnswers[1]}\n\n " +
+                                  $":three: {mixedAnswers[2]}\n\n " +
+                                  $":four: {mixedAnswers[3]}",
 
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
