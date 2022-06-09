@@ -35,9 +35,9 @@ public class StudentCommands : BaseCommandModule
         var studentId = commandCtx.User.Id;
         
         var classId = commandCtx.Guild.Id;
-        var date = commandCtx.Message.Timestamp.DateTime;
+        var date = DateTime.Today;
 
-        userChannel.SendMessageAsync($"You have now reported your absence, reason: {input}");
+        await userChannel.SendMessageAsync($"You have now reported your absence, reason: {input}");
 
         await using (var scope = commandCtx.Services.CreateAsyncScope())
         {

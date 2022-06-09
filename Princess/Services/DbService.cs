@@ -210,6 +210,13 @@ public class DbService
     {
         await _ctx.Database.EnsureDeletedAsync();
         await _ctx.Database.EnsureCreatedAsync();
+        
+    }
+
+    public async Task RecreateAndSeedAsync()
+    {
+        await _ctx.Database.EnsureDeletedAsync();
+        await _ctx.Database.EnsureCreatedAsync();
         await SeedAsync();
     }
 }

@@ -138,17 +138,18 @@ public class PresenceHandler
     {
         var message = reason ?? "Absence reported";
 
-        var student = _ctx.Students
+        var student = await _ctx.Students
             .Where(x => x.Id == studentId)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-        var classget = _ctx.Classes
+        var classget =await  _ctx.Classes
             .Where(x => x.Id == classId)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-        var lecture = _ctx.Lectures
+        var lecture = await _ctx.Lectures
             .Where(x => x.Class == classget && x.Date == date)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
+
 
         if (lecture == null)
         {
@@ -156,19 +157,20 @@ public class PresenceHandler
             {
                 Date = date,
                 Class = classget,
-                Students = classget.Students
+                Students = classget.Students,
+                Presences = new List<Presence>()
             };
 
-            _ctx.Lectures.Add(newLecture);
+            await _ctx.Lectures.AddAsync(newLecture);
+            await _ctx.SaveChangesAsync();
 
-            lecture = _ctx.Lectures
+            lecture = await _ctx.Lectures
                 .Where(x => x.Class == classget && x.Date == date)
-                .FirstOrDefault(); ;
+                .FirstOrDefaultAsync(); ;
 
         }
 
-        if (lecture != null && student != null && classget != null)
-        {
+       
             var presence = new Presence
             {
                 Attended = false,
@@ -181,9 +183,7 @@ public class PresenceHandler
 
             await _ctx.SaveChangesAsync();
             return true;
-        }
 
-        return false;
     }
 
     public async Task<List<Class>> GetAllSchoolclasses()
@@ -290,20 +290,22 @@ public class PresenceHandler
         await _ctx.SaveChangesAsync();
     }
 
-    public async Task RegisterPresence(ulong studentId, ulong classId, DateTime date, string? reason = null)
+    public async Task<Lecture> RegisterPresence(ulong studentId, ulong classId, DateTime date, ulong teacherId, string? reason = null)
     {
         var student = await _ctx.Students
             .Include(s => s.Lectures)
             .Include(s => s.Presences)
             .FirstOrDefaultAsync(s => s.Id == studentId);
 
-        var classget = _ctx.Classes
+        var classget = await _ctx.Classes
             .Where(x => x.Id == classId)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-        var lecture = _ctx.Lectures
+        var lecture = await _ctx.Lectures
             .Where(x => x.Class == classget && x.Date == date)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
+
+        var teacher = await _ctx.Teachers.FirstOrDefaultAsync(t => t.Id == teacherId);
 
         if (lecture == null)
         {
@@ -311,30 +313,38 @@ public class PresenceHandler
             {
                 Date = date,
                 Class = classget,
-                Students = classget.Students
+                Students = classget.Students,
+                Presences = new List<Presence>(),
+                Teacher = teacher
+                
             };
 
-            _ctx.Lectures.Add(newLecture);
+            await _ctx.Lectures.AddAsync(newLecture);
 
-            lecture = _ctx.Lectures
+            await _ctx.SaveChangesAsync();
+
+            lecture = await _ctx.Lectures
                 .Where(x => x.Class == classget && x.Date == date)
-                .FirstOrDefault(); ;
+                .FirstOrDefaultAsync(); 
 
-            if (lecture != null && student != null && classget != null)
-            {
-                var presence = new Presence
-                {
-                    Attended = false,
-                    ReasonAbsence = reason,
-                    Student = student,
-                    Lecture = lecture
-                };
-
-                _ctx.Presences.Add(presence);
-
-                await _ctx.SaveChangesAsync();
-                
-            }
         }
+        else
+        {
+            lecture.Teacher = teacher;
+            await _ctx.SaveChangesAsync();
+        }
+        var presence = new Presence
+        {
+            Attended = true,
+            ReasonAbsence = reason,
+            Student = student,
+            Lecture = lecture
+        };
+
+        await _ctx.Presences.AddAsync(presence);
+
+        await _ctx.SaveChangesAsync();
+
+        return lecture;
     }
 }
