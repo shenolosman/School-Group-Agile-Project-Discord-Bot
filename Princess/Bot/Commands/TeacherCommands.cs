@@ -260,18 +260,26 @@ namespace Princess.Bot.Commands
                 foreach (var result in quizAnswers)
                 {
                     var isBot = result.Users.Any(x => x.IsBot);
-
-                    if (!isBot)
-                    {
-                        if (containsEmojis)
+                    
+                        if (!isBot)
                         {
-                            foreach (var user in result.Users)
+                            if (containsEmojis)
                             {
-                                if (!anyoneWhoReacted.Contains(user)) anyoneWhoReacted.Add(user);
+                                foreach (var user in result.Users)
+                                {
+                                    if (!anyoneWhoReacted.Contains(user))
+                                    { 
+                                        var member = allMembers.FirstOrDefault(x => x.Id == user.Id); 
+                                        foreach (var role in member.Roles) 
+                                        {
+                                            if( role.Name == "Student") anyoneWhoReacted.Add(user);
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
                 }
+                
 
                 var correctEmoji = String.Empty;
 
