@@ -134,7 +134,7 @@ public class PresenceHandler
             x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
     }
 
-    public async Task<Lecture> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, ulong? teacherId, string? reason = null)
+    public async Task<Lecture> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, ulong? teacherId = null, string? reason = null)
     {
         var message = reason ?? "Absence reported";
 
