@@ -134,24 +134,41 @@ public class PresenceHandler
             x.Lecture.Class.Name == selectedClass && x.Lecture.Teacher.Name == selectedTeacher).ToList();
     }
 
-    public async Task<bool> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, string? reason = null)
+    public async Task<Lecture> RegisterAbsenceForStudent(ulong studentId, ulong classId, DateTime date, ulong? teacherId = null, string? reason = null)
     {
         var message = reason ?? "Absence reported";
 
         var student = await _ctx.Students
-            .Where(x => x.Id == studentId)
-            .FirstOrDefaultAsync();
+           .FirstOrDefaultAsync(x => x.Id == studentId);
 
         var classget =await  _ctx.Classes
-            .Where(x => x.Id == classId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(x => x.Id == classId);
 
         var lecture = await _ctx.Lectures
-            .Where(x => x.Class == classget && x.Date == date)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(x => x.Class == classget && x.Date == date);
+        
 
+        if (teacherId != null && lecture == null)
+        {
+            Teacher teacher = await _ctx.Teachers
+                .FirstOrDefaultAsync(t => t.Id == teacherId);
+            var newLecture = new Lecture()
+            {
+                Teacher = teacher,
+                Date = date,
+                Class = classget,
+                Students = classget.Students,
+                Presences = new List<Presence>()
+            };
 
-        if (lecture == null)
+            await _ctx.Lectures.AddAsync(newLecture);
+            await _ctx.SaveChangesAsync();
+
+            lecture = await _ctx.Lectures
+                .FirstOrDefaultAsync(x => x.Class == classget && x.Date == date); ;
+        }
+
+        if (teacherId == null && lecture == null)
         {
             var newLecture = new Lecture()
             {
@@ -165,25 +182,21 @@ public class PresenceHandler
             await _ctx.SaveChangesAsync();
 
             lecture = await _ctx.Lectures
-                .Where(x => x.Class == classget && x.Date == date)
-                .FirstOrDefaultAsync(); ;
-
+                .FirstOrDefaultAsync(x => x.Class == classget && x.Date == date); ;
         }
 
-       
-            var presence = new Presence
-            {
-                Attended = false,
-                ReasonAbsence = message,
-                Student = student,
-                Lecture = lecture
-            };
+        var presence = new Presence
+        {
+            Attended = false,
+            ReasonAbsence = message,
+            Student = student,
+            Lecture = lecture
+        };
 
-            _ctx.Presences.Add(presence);
+        _ctx.Presences.Add(presence);
 
-            await _ctx.SaveChangesAsync();
-            return true;
-
+        await _ctx.SaveChangesAsync();
+        return lecture;
     }
 
     public async Task<List<Class>> GetAllSchoolclasses()
