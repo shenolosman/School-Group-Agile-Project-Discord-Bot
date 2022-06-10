@@ -9,7 +9,7 @@
 
     int lectureId = Model.LectureId;
 
-    var lecture = await _presenceHandler.GetLectureAsync(lectureId);
+    var lecture = await _presenceHandler.GetLecture(lectureId);
     var presenceList = lecture.Presences;
     var allSchoolClasses = await _presenceHandler.GetAllSchoolclasses();
     var teachers = await _presenceHandler.GetAllTeachers();
