@@ -68,6 +68,11 @@ body {
     text-align: left;
     margin: auto;
 }
+.tdSize-extended {
+    width: 50.2%;
+    text-align: left;
+    margin: auto;
+}
 #triangleTwo {
     background-color: #a0b6b0;
     clip-path: polygon(100% 0, 100% 100%, 0 100%);

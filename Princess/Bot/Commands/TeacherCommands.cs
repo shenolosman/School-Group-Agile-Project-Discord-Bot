@@ -7,20 +7,20 @@ using Princess.Bot.Services;
 using Princess.Models;
 using Princess.Services;
 
-namespace Princess.Bot.Commands;
-
-public class TeacherCommands : BaseCommandModule
+namespace Princess.Bot.Commands
 {
-    private async Task RegisterStudents(CommandContext cmdCtx, List<DiscordMember> allMembers)
+    public class TeacherCommands : BaseCommandModule
     {
-        var studentsDiscord = allMembers;
-
-
-        await using (var scope = cmdCtx.Services.CreateAsyncScope())
+        private async Task RegisterStudents(CommandContext cmdCtx, List<DiscordMember> allMembers)
         {
-            var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
-            var teacherRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Teacher");
-            var studentRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Student");
+            
+            var studentsDiscord = allMembers;
+
+            await using (var scope = cmdCtx.Services.CreateAsyncScope())
+            {
+                var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
+                var teacherRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Teacher");
+                var studentRole = cmdCtx.Guild.Roles.FirstOrDefault(x => x.Value.Name == "Student");
 
             foreach (var student in studentsDiscord)
                 if (!student.Roles.Contains(teacherRole.Value) && !student.IsBot)
@@ -30,24 +30,27 @@ public class TeacherCommands : BaseCommandModule
                     if (await presenceHandler.StudentExists(student.Id))
                         await presenceHandler.RegisterClassToStudent(student.Id, cmdCtx.Guild.Id);
 
-                    else
-                        await presenceHandler.RegisterNewStudent(student.Nickname ?? student.Username, student.Id,
-                            cmdCtx.Guild.Id);
-                }
-        }
-    }
+                        }
 
-    [Command("presence")]
-    [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
-                 "Students answer to a question and you will get who was present.")]
-    [RequireRoles(RoleCheckMode.Any, "Teacher")]
-    public async Task PresenceQuiz(CommandContext cmdCtx,
-        [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
-    {
-        await cmdCtx.Message.DeleteAsync();
-        var lecture = new Lecture();
-        var allMembersIcol = await cmdCtx.Guild.GetAllMembersAsync();
-        var allMembers = new List<DiscordMember>(allMembersIcol);
+                        else
+                        {
+                            await presenceHandler.RegisterNewStudent(student.Nickname ?? student.Username, student.Id, cmdCtx.Guild.Id);
+                        }
+                    }
+                }
+            }
+        }
+
+        [Command("presence")]
+        [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
+                     "Students answer to a question and you will get who was present.")]
+        [RequireRoles(RoleCheckMode.Any, "Teacher")]
+        public async Task PresenceQuiz(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
+        {
+            await cmdCtx.Message.DeleteAsync();
+            Lecture lecture = new Lecture();
+            var allMembersIcol = await cmdCtx.Guild.GetAllMembersAsync();
+            var allMembers = new List<DiscordMember>(allMembersIcol);
 
         await RegisterStudents(cmdCtx, allMembers);
 
@@ -55,19 +58,18 @@ public class TeacherCommands : BaseCommandModule
 
         var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
 
-
-        var dmEmbed = new DiscordEmbedBuilder
-        {
-            Title = "Attendence",
-            Description = $"Your teacher in \"{cmdCtx.Guild.Name}\" has made an presence-check in" +
-                          $" the <#{cmdCtx.Channel.Id}> channel. You have {reactionDuration.Minutes} " +
-                          $"minutes and {reactionDuration.Seconds} seconds to answer that message" +
-                          ", otherwise you will be set as absent to that lecture",
-            Author = new DiscordEmbedBuilder.EmbedAuthor
+            var dmEmbed = new DiscordEmbedBuilder
             {
-                IconUrl = cmdCtx.User.AvatarUrl,
-                Name = cmdCtx.User.Username
-            },
+                Title = "Attendence",
+                Description = $"Your teacher in \"{cmdCtx.Guild.Name}\" has made an presence-check in" +
+                              $" the <#{cmdCtx.Channel.Id}> channel. You have {reactionDuration.Minutes} " +
+                              $"minutes and {reactionDuration.Seconds} seconds to answer that message" +
+                              $", otherwise you will be set as absent to that lecture",
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    IconUrl = cmdCtx.User.AvatarUrl,
+                    Name = cmdCtx.User.Username,
+                },
 
             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
             {
@@ -76,21 +78,27 @@ public class TeacherCommands : BaseCommandModule
             Color = DiscordColor.Gold
         };
 
-        // Sends a DM to all users with the student role when presence is called
-
-        foreach (var user in allMembers)
-            try
+            // Sends a DM to all users with the student role when presence is called
+           
+            foreach (var user in allMembers)
             {
-                var isStudent = false;
+                try
+                {
+                    bool isStudent = false;
 
-                foreach (var role in user.Roles)
-                    if (role.Name == "Student")
-                        await user.SendMessageAsync(dmEmbed);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                    foreach (var role in user.Roles)
+                    {
+                        if (role.Name == "Student")
+                        {
+                            await user.SendMessageAsync(embed: dmEmbed);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
 
         await using (var scope = cmdCtx.Services.CreateAsyncScope())
@@ -112,12 +120,11 @@ public class TeacherCommands : BaseCommandModule
             var decodedIncorrectAnswerTwo = HttpUtility.HtmlDecode(incorrectAnswerTwo);
             var decodedIncorrectAnswerThree = HttpUtility.HtmlDecode(incorrectAnswerThree);
 
-
-            var correctAndIncorrectAnswers = new List<string>
-            {
-                decodedCorrectAnswer, decodedIncorrectAnswerOne, decodedIncorrectAnswerTwo,
-                decodedIncorrectAnswerThree
-            };
+                List<string> correctAndIncorrectAnswers = new List<string>
+                {
+                    decodedCorrectAnswer, decodedIncorrectAnswerOne, decodedIncorrectAnswerTwo,
+                    decodedIncorrectAnswerThree
+                };
 
             var mentionStudent = "";
 
@@ -155,8 +162,7 @@ public class TeacherCommands : BaseCommandModule
                 Color = DiscordColor.Gold
             };
 
-
-            var quizMessage = await cmdCtx.Channel.SendMessageAsync(decodedQuizEmbed);
+                var quizMessage = await cmdCtx.Channel.SendMessageAsync(embed: decodedQuizEmbed);
 
             // Creates Discord-Emojis for the question 
             var answerOne = DiscordEmoji.FromName(cmdCtx.Client, ":one:");
@@ -205,17 +211,20 @@ public class TeacherCommands : BaseCommandModule
 
                     if (answer.Emoji == answerFour) totalFourthAnswers++;
 
-                    var student = absentStudents.FirstOrDefault(s => s.Id == user.Id);
-                    if (student != null)
-                    {
-                        absentStudents.Remove(student);
-                        lecture = await presenceHandler.RegisterPresence(student.Id, cmdCtx.Guild.Id, DateTime.Today,
-                            cmdCtx.Member.Id);
+                            var student = absentStudents.FirstOrDefault(s => s.Id == user.Id);
+                            if (student != null)
+                            {
+                                absentStudents.Remove(student);
+                                lecture = await presenceHandler.RegisterPresence(student.Id, cmdCtx.Guild.Id, DateTime.Today, cmdCtx.Member.Id);
+                            }
+                        }
                     }
                 }
 
-            foreach (var student in absentStudents)
-                await presenceHandler.RegisterAbsenceForStudent(student.Id, cmdCtx.Guild.Id, DateTime.Today);
+                foreach (var student in absentStudents)
+                {
+                    lecture = await presenceHandler.RegisterAbsenceForStudent(student.Id, cmdCtx.Guild.Id, DateTime.Today, cmdCtx.User.Id);
+                }
 
             var totalAnswerResult = new Dictionary<string, int>();
 
@@ -224,24 +233,36 @@ public class TeacherCommands : BaseCommandModule
             totalAnswerResult.Add(mixedAnswers[2], totalThirdAnswers);
             totalAnswerResult.Add(mixedAnswers[3], totalFourthAnswers);
 
+                // Collects all answers in a list, just one answer per user
+                var containsEmojis = quizAnswers.Any(x =>
+                    x.Emoji == answerOne || x.Emoji == answerTwo ||
+                    x.Emoji == answerThree || x.Emoji == answerFour);
 
-            // Collects all answers in a list, just one answer per user
-            var containsEmojis = quizAnswers.Any(x =>
-                x.Emoji == answerOne || x.Emoji == answerTwo ||
-                x.Emoji == answerThree || x.Emoji == answerFour);
+                foreach (var result in quizAnswers)
+                {
+                    var isBot = result.Users.Any(x => x.IsBot);
+                    
+                        if (!isBot)
+                        {
+                            if (containsEmojis)
+                            {
+                                foreach (var user in result.Users)
+                                {
+                                    if (!anyoneWhoReacted.Contains(user))
+                                    { 
+                                        var member = allMembers.FirstOrDefault(x => x.Id == user.Id); 
+                                        foreach (var role in member.Roles) 
+                                        {
+                                            if( role.Name == "Student") anyoneWhoReacted.Add(user);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                }
+                
 
-            foreach (var result in quizAnswers)
-            {
-                var isBot = result.Users.Any(x => x.IsBot);
-
-                if (!isBot)
-                    if (containsEmojis)
-                        foreach (var user in result.Users)
-                            if (!anyoneWhoReacted.Contains(user))
-                                anyoneWhoReacted.Add(user);
-            }
-
-            var correctEmoji = string.Empty;
+                var correctEmoji = String.Empty;
 
             foreach (var keyValue in answerByEmoji)
                 if (keyValue.Key == decodedCorrectAnswer)
@@ -261,37 +282,37 @@ public class TeacherCommands : BaseCommandModule
                 Color = DiscordColor.Gold
             };
 
-            await cmdCtx.Channel.SendMessageAsync(quizResultEmbed);
+                await cmdCtx.Channel.SendMessageAsync(embed: quizResultEmbed);
 
+                var teacherDm = new DiscordEmbedBuilder
+                {
+                    Title = "Gathered Presence Check Info",
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
+                        Name = cmdCtx.Client.CurrentUser.Username,
+                    },
+                    Color = DiscordColor.Gold,
+                    Description = $"Here is the gathered info from the presence-check you made" +
+                                  $" in {cmdCtx.Channel.Mention}.\nPresent: {anyoneWhoReacted.Count}\nAbsent: {absentStudents.Count}\n" +
+                                  $"To see further information and to be able to export the presence-check follow this link: https://localhost:8000/Class/Lecture/{lecture.Id}\n",
+                    Timestamp = cmdCtx.Message.Timestamp,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                    {
+                        Url = cmdCtx.Client.CurrentUser.AvatarUrl,
+                    },
+                    Url = $@"https://localhost:8000/Class/Lecture/{lecture.Id}",
 
-            var teacherDm = new DiscordEmbedBuilder
-            {
-                Title = "Gathered Presence Check Info",
-                Author = new DiscordEmbedBuilder.EmbedAuthor
+                }; 
+                try 
                 {
-                    IconUrl = cmdCtx.Client.CurrentUser.AvatarUrl,
-                    Name = cmdCtx.Client.CurrentUser.Username
-                },
-                Color = DiscordColor.Gold,
-                Description = "Here is the gathered info from the presence-check you made" +
-                              $" in {cmdCtx.Channel.Mention}.\nPresent: {anyoneWhoReacted.Count}\nAbsent: XX\n" +
-                              $"Total students in {cmdCtx.Guild.Name}: XX\n" +
-                              "To see further information and to be able to export the presence-check use this link:\n",
-                Timestamp = cmdCtx.Message.Timestamp,
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                    await cmdCtx.Member.SendMessageAsync(embed: teacherDm);
+                }
+                catch (Exception e)
                 {
-                    Url = cmdCtx.Client.CurrentUser.AvatarUrl
-                },
-                Url = $@"https://localhost:8000/Class/Lecture/{lecture.Id}"
-            };
-            try
-            {
-                await cmdCtx.Member.SendMessageAsync(teacherDm);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
     }

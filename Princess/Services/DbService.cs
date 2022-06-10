@@ -70,7 +70,7 @@ public class DbService
         {
             new() {Attended = true, Student = students[0], Lecture = lectures[0], ReasonAbsence = null},
             new() {Attended = true, Student = students[1], Lecture = lectures[0], ReasonAbsence = null},
-            new() {Attended = false, Student = students[2], Lecture = lectures[0], ReasonAbsence = "reason 1"},
+            new() {Attended = false, Student = students[2], Lecture = lectures[0], ReasonAbsence = "A very long reason why I am not present today.."},
             new() {Attended = false, Student = students[3], Lecture = lectures[0], ReasonAbsence = "reason 2"},
             new() {Attended = false, Student = students[4], Lecture = lectures[0], ReasonAbsence = null},
             new() {Attended = true, Student = students[5], Lecture = lectures[0], ReasonAbsence = null},
