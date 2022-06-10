@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Princess.Models;
 using Princess.Services;
+using Princess.CSV;
 
 namespace Princess.Pages.Class
 {
@@ -35,8 +36,15 @@ namespace Princess.Pages.Class
          }
         public async Task <IActionResult>  OnPostAsync()
         {
-            var lectureId = LectureId;
-            return RedirectToPage("Lecture", lectureId);
+            var lectureIdFromButton = LectureId;
+            var allStudentsFromPresenceCheck = await _presenceHandler.GetLectureAsync(lectureIdFromButton);
+            var csvCreateFile = new CsvProgram("test");
+            
+           
+
+
+
+            return RedirectToPage("Lecture", lectureIdFromButton);
         }
         private async Task<List<Student>> GetPaginatedResult(int lectureId, int currentPage, int pageSize = 10)
         {

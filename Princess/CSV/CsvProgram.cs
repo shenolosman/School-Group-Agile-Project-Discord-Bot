@@ -7,12 +7,14 @@ namespace Princess.CSV
     public class CsvProgram
     {
 
-        public CsvProgram()
+        public CsvProgram(string data)
         {
+
             WriteToCsvFile();
+            string _data = data;
         }
         
-        private static void WriteToCsvFile()
+        public static void WriteToCsvFile()
         {
             var attendenceList = new List<ExportToCSV>()
             {

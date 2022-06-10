@@ -53,6 +53,5 @@ var bot = new Bot(app.Services);
 
 bot.RunAsync().GetAwaiter();
 
-var csvCreateFile = new CsvProgram();
 
 app.Run();
