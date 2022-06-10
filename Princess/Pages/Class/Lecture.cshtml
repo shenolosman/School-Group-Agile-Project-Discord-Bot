@@ -48,12 +48,10 @@
 <table class="table header-table">
     <thead>
     <tr>
-        @*<th class="tdSize" scope="col">Class</th>
-        <th class="tdSize" scope="col">Teacher</th>*@
         <th class="tdSize" scope="col">Student</th>
-        <th class="tdSize" scope="col">Date | Time</th>
+        <th class="tdSize" scope="col">Date</th>
         <th class="tdSize" scope="col">Present</th>
-        <th class="tdSize" scope="col">Reason for absence</th>
+        <th class="tdSize-extended" scope="col">Reason for absence</th>
     </tr>
     </thead>
 </table>
@@ -64,12 +62,17 @@
     <table class="table bg-table ctx-table">
         <tbody>
         <tr>
-            @*<td class="tdSize" scope="row">@lecture.Class.Name</td>
-            <td class="tdSize">@lecture.Teacher.Name</td>*@
             <td class="tdSize">@student.Name</td>
-            <td class="tdSize">@lecture.Date.ToShortDateString(), @lecture.Date.ToShortTimeString()</td>
-            <td class="tdSize">@Html.CheckBoxFor(x => @presence.Attended, new {@disabled = "disabled"} )</td>
-            <td class="tdSize">@presence.ReasonAbsence</td>
+            <td class="tdSize">@lecture.Date.ToShortDateString()</td>
+            @if (@presence.Attended == true)
+            {
+                <td class="tdSize"><img src="~/img/checked-green.png" width="28px"/></td>
+            }
+            else
+            {
+                <td class="tdSize"></td>
+            }
+            <td class="tdSize-extended">@presence.ReasonAbsence</td>
         </tr>
         </tbody>
     </table>
