@@ -31,8 +31,13 @@ namespace Princess.Pages.Class
         {
             Students = await GetPaginatedResult(LectureId, CurrentPage, PageSize);
             Count = await GetCount(LectureId);
-         }
 
+         }
+        public async Task <IActionResult>  OnPostAsync()
+        {
+            var lectureId = LectureId;
+            return RedirectToPage("Lecture", lectureId);
+        }
         private async Task<List<Student>> GetPaginatedResult(int lectureId, int currentPage, int pageSize = 10)
         {
             var lecture = await _presenceHandler.GetLectureAsync(lectureId);

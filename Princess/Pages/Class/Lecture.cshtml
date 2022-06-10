@@ -38,7 +38,10 @@
             <li><a class="dropdown-item" href="#">@schoolClass.Name</a></li>
         }
     </ul>
-    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
+    <Form method="post" >
+    <input asp-for="@lectureId" type="hidden"></input>
+    <Button type="submit" class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file"></Button>
+    </Form>
 </div>
 <div class="ms-auto">
     
