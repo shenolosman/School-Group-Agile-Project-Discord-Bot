@@ -12,12 +12,10 @@ namespace Princess.Bot.Commands
 {
     public class TeacherCommands : BaseCommandModule
     {
-     
         private async Task RegisterStudents(CommandContext cmdCtx, List<DiscordMember> allMembers)
         {
             
             var studentsDiscord = allMembers;
-
 
             await using (var scope = cmdCtx.Services.CreateAsyncScope())
             {
@@ -43,20 +41,15 @@ namespace Princess.Bot.Commands
                             await presenceHandler.RegisterStudent(student.Nickname ?? student.Username, student.Id, cmdCtx.Guild.Id);
                         }
                     }
-                   
                 }
-                
             }
-
-            
         }
 
         [Command("presence")]
         [Description("Initiates an Presence-check, the only one who can do it is users with the 'Teacher' role. " +
                      "Students answer to a question and you will get who was present.")]
         [RequireRoles(RoleCheckMode.Any, "Teacher")]
-        public async Task PresenceQuiz(CommandContext cmdCtx,
-            [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
+        public async Task PresenceQuiz(CommandContext cmdCtx, [Description("ex 10s or 10m or 10h")] TimeSpan reactionDuration)
         {
             await cmdCtx.Message.DeleteAsync();
             Lecture lecture = new Lecture();
@@ -69,9 +62,6 @@ namespace Princess.Bot.Commands
 
             var studentRole = discordGuildRoles.FirstOrDefault(role => role.Value.Name.ToLower() == "student");
 
-
-
-      
             var dmEmbed = new DiscordEmbedBuilder
             {
                 Title = "Attendence",
@@ -96,7 +86,6 @@ namespace Princess.Bot.Commands
            
             foreach (var user in allMembers)
             {
-
                 try
                 {
                     bool isStudent = false;
@@ -108,7 +97,6 @@ namespace Princess.Bot.Commands
                             await user.SendMessageAsync(embed: dmEmbed);
                         }
                     }
-
                 }
                 catch (Exception e)
                 {
@@ -135,7 +123,6 @@ namespace Princess.Bot.Commands
                 string decodedIncorrectAnswerOne = HttpUtility.HtmlDecode(incorrectAnswerOne);
                 string decodedIncorrectAnswerTwo = HttpUtility.HtmlDecode(incorrectAnswerTwo);
                 string decodedIncorrectAnswerThree = HttpUtility.HtmlDecode(incorrectAnswerThree);
-
 
                 List<string> correctAndIncorrectAnswers = new List<string>
                 {
@@ -178,7 +165,6 @@ namespace Princess.Bot.Commands
                     },
                     Color = DiscordColor.Gold,
                 };
-
 
                 var quizMessage = await cmdCtx.Channel.SendMessageAsync(embed: decodedQuizEmbed);
 
@@ -250,15 +236,13 @@ namespace Princess.Bot.Commands
                                 absentStudents.Remove(student);
                                 lecture = await presenceHandler.RegisterPresence(student.Id, cmdCtx.Guild.Id, DateTime.Today, cmdCtx.Member.Id);
                             }
-
-                           
                         }
                     }
                 }
 
                 foreach (var student in absentStudents)
                 {
-                    await presenceHandler.RegisterAbsenceForStudent(student.Id, cmdCtx.Guild.Id, DateTime.Today);
+                    lecture = await presenceHandler.RegisterAbsenceForStudent(student.Id, cmdCtx.Guild.Id, DateTime.Today, cmdCtx.User.Id);
                 }
 
                 var totalAnswerResult = new Dictionary<string, int>();
@@ -267,7 +251,6 @@ namespace Princess.Bot.Commands
                 totalAnswerResult.Add(mixedAnswers[1], totalSecondAnswers);
                 totalAnswerResult.Add(mixedAnswers[2], totalThirdAnswers);
                 totalAnswerResult.Add(mixedAnswers[3], totalFourthAnswers);
-
 
                 // Collects all answers in a list, just one answer per user
                 var containsEmojis = quizAnswers.Any(x =>
@@ -314,8 +297,6 @@ namespace Princess.Bot.Commands
 
                 await cmdCtx.Channel.SendMessageAsync(embed: quizResultEmbed);
 
-                
-
                 var teacherDm = new DiscordEmbedBuilder
                 {
                     Title = "Gathered Presence Check Info",
@@ -326,9 +307,8 @@ namespace Princess.Bot.Commands
                     },
                     Color = DiscordColor.Gold,
                     Description = $"Here is the gathered info from the presence-check you made" +
-                                  $" in {cmdCtx.Channel.Mention}.\nPresent: {anyoneWhoReacted.Count}\nAbsent: XX\n" +
-                                  $"Total students in {cmdCtx.Guild.Name}: XX\n" +
-                                  $"To see further information and to be able to export the presence-check use this link:\n",
+                                  $" in {cmdCtx.Channel.Mention}.\nPresent: {anyoneWhoReacted.Count}\nAbsent: {absentStudents.Count}\n" +
+                                  $"To see further information and to be able to export the presence-check follow this link: https://localhost:8000/Class/Lecture/{lecture.Id}\n",
                     Timestamp = cmdCtx.Message.Timestamp,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
                     {
@@ -348,7 +328,5 @@ namespace Princess.Bot.Commands
                 }
             }
         }
-
-        
     }
 }
