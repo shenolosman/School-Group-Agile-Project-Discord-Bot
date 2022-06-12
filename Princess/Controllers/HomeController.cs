@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+//using System.Web.WebPages.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Princess.Models;
-using System.Diagnostics;
 using Princess.Services;
+using System.Diagnostics;
 
 namespace Princess.Controllers
 {
@@ -16,11 +18,62 @@ namespace Princess.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index() 
-         { 
-             return View();
-         }
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> GetTeachersClass(string ddType)
+        {
+            var allClassList = await _presenceHandler.GetAllSchoolclasses();
+            List<SelectListItem> result = new List<SelectListItem>();
+            bool isSucceed = true;
+            try
+            {
+                switch (ddType)
+                {
+                    case "getClass":
+                        foreach (var firstDropdown in allClassList)
+                        {
+                            result.Add(new SelectListItem
+                            {
+                                Text = firstDropdown.Name,
+                                Value = firstDropdown.Id.ToString()
+                            });
+                        }
+                        break;
+                    case "getTeacher":
+                        foreach (var secondDropdown in allClassList)
+                        {
+                            //trying to get teacher by classid with secondDropdown.Teachers.Where(x => x.Id == (ulong)classId) but nothing came
+                            foreach (var item in secondDropdown.Teachers)
+                            {
+                                result.Add(new SelectListItem
+                                {
+                                    Text = item.Name,
+                                    Value = item.Id.ToString()
+                                });
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                //if any error occurs
+                isSucceed = false;
+                result = new List<SelectListItem>();
+                result.Add(new SelectListItem
+                {
+                    Text = "Got Issue",
+                    Value = "Default"
+                });
 
+            }
+            return new JsonResult(new { ok = isSucceed, text = result });
+        }
         public IActionResult Privacy()
         {
             return View();
