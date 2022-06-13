@@ -1,3 +1,7 @@
+using System.Globalization;
+using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Princess.Models;
@@ -32,20 +36,49 @@ namespace Princess.Pages.Class
         {
             Students = await GetPaginatedResult(LectureId, CurrentPage, PageSize);
             Count = await GetCount(LectureId);
-
-         }
+        }
         public async Task <IActionResult>  OnPostAsync()
         {
             var lectureIdFromButton = LectureId;
             var allStudentsFromPresenceCheck = await _presenceHandler.GetLectureAsync(lectureIdFromButton);
-            var csvCreateFile = new CsvProgram(allStudentsFromPresenceCheck);
-            
-           
 
-
-
-            return RedirectToPage("Lecture", lectureIdFromButton);
+            var date = allStudentsFromPresenceCheck.Date;
+            // TODO EXPORT SHOULD BE IN OnGetAsync instead
+            return File(WriteCsvToMemory(allStudentsFromPresenceCheck), "text/csv", $"lecture-{date}.csv");
         }
+
+        private byte[] WriteCsvToMemory(Lecture data)
+        {
+            var presenceList = data.Presences;
+
+            var testAttendanceList = new List<ExportToCSV>() { };
+
+            foreach (var testStudent in data.Students)
+            {
+                var presence = presenceList.FirstOrDefault(p => p.Student == testStudent);
+                testAttendanceList.Add(new ExportToCSV()
+                {
+                    theClass = data.Class.Name,
+                    teacher = data.Teacher.Name,
+                    student = testStudent.Name,
+                    registerTime = data.Date,
+                    presence = presence.Attended,
+                });
+            }
+
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+            using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)
+                   {
+                       Delimiter = ";",
+                   }))
+            {
+                csvWriter.WriteRecords(testAttendanceList);
+                streamWriter.Flush();
+                return memoryStream.ToArray();
+            }
+        }
+
         private async Task<List<Student>> GetPaginatedResult(int lectureId, int currentPage, int pageSize = 10)
         {
             var lecture = await _presenceHandler.GetLectureAsync(lectureId);
