@@ -1,36 +1,34 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 
-namespace Princess.Bot.Handlers.Dialogue.Steps
+namespace Princess.Bot.Handlers.Dialogue.Steps;
+
+public abstract class DialogueStepBase : IDialogueStep
 {
-    public abstract class DialogueStepBase : IDialogueStep
+    protected readonly string _content;
+
+    public DialogueStepBase(string content)
     {
-        protected readonly string _content;
+        _content = content;
+    }
 
-        public DialogueStepBase(string content)
+    public Action<DiscordMessage> OnMessageAdded { get; set; } = delegate { };
+    public abstract IDialogueStep NextStep { get; }
+
+    public abstract Task<bool> ProcessStep(DiscordClient client, DiscordChannel channel, DiscordUser user);
+
+    protected async Task TryAgain(DiscordChannel channel, string problem)
+    {
+        var embedBuilder = new DiscordEmbedBuilder
         {
-            _content = content;
-        }
-        public  Action<DiscordMessage> OnMessageAdded { get; set; } = delegate { };
-        public abstract IDialogueStep NextStep { get; }
+            Title = "Please Try Again",
+            Color = DiscordColor.Red
+        };
 
-        public abstract Task<bool> ProcessStep(DiscordClient client, DiscordChannel channel, DiscordUser user);
+        embedBuilder.AddField("There was a problem with your previous input", problem);
 
-        protected async Task TryAgain(DiscordChannel channel, string problem)
-        {
-            var embedBuilder = new DiscordEmbedBuilder
-            {
-                Title = "Please Try Again",
-                Color = DiscordColor.Red
-            };
+        var embed = await channel.SendMessageAsync(embedBuilder);
 
-            embedBuilder.AddField("There was a problem with your previous input", problem);
-
-            var embed = await channel.SendMessageAsync(embed:embedBuilder);
-
-            OnMessageAdded(embed);
-        }
-        
-
+        OnMessageAdded(embed);
     }
 }

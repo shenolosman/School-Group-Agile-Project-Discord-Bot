@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using Princess.Bot.Commands;
 using Princess.Data;
 using Princess.Models;
-using TestBot;
 
 namespace Princess.Bot;
 
@@ -22,9 +21,7 @@ public class Bot
         _Services = services;
     }
 
-
     public DiscordClient Client { get; private set; }
-    public InteractivityExtension Interactivity { get; private set; }
     public CommandsNextExtension Commands { get; private set; }
     public IServiceProvider _Services { get; }
 
@@ -75,8 +72,6 @@ public class Bot
         Commands = Client.UseCommandsNext(commandConfig);
 
         // Add Command classes here for them to work
-        Commands.RegisterCommands<GeneralCommands>();
-
         Commands.RegisterCommands<AdminCommands>();
 
         Commands.RegisterCommands<TeacherCommands>();
@@ -109,7 +104,7 @@ public class Bot
 
             foreach (var guild in listOfGuilds)
             {
-                bool guildInDB = await ctx.Classes.AnyAsync(c => c.Id == guild.Id);
+                var guildInDB = await ctx.Classes.AnyAsync(c => c.Id == guild.Id);
 
                 // Adds guild to class in DB if it doesnt exist
                 if (!guildInDB)
@@ -117,7 +112,7 @@ public class Bot
                     var schoolClass = new Class
                     {
                         Id = guild.Id,
-                        Name = guild.Name,
+                        Name = guild.Name
                     };
                     try
                     {
@@ -153,18 +148,18 @@ public class Bot
                     {
                         Title = "Creation of Roles",
                         Description =
-                            $"A Teacher and Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Teacher and Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
-                            Name = sender.CurrentUser.Username,
+                            Name = sender.CurrentUser.Username
                         },
 
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                         {
                             Url = sender.CurrentUser.AvatarUrl
                         },
-                        Color = DiscordColor.Gold,
+                        Color = DiscordColor.Gold
                     };
 
                     var guildChannels = guild.Channels.Values;
@@ -173,7 +168,7 @@ public class Bot
 
                     try
                     {
-                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                        await sender.SendMessageAsync(channelToMessage, noticeRoleCreationEmbed);
                     }
                     catch (Exception exception)
                     {
@@ -194,18 +189,18 @@ public class Bot
                     {
                         Title = "Creation Of Teacher Role",
                         Description =
-                            $"A Teacher Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Teacher Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
-                            Name = sender.CurrentUser.Username,
+                            Name = sender.CurrentUser.Username
                         },
 
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                         {
                             Url = sender.CurrentUser.AvatarUrl
                         },
-                        Color = DiscordColor.Gold,
+                        Color = DiscordColor.Gold
                     };
 
                     var guildChannels = guild.Channels.Values;
@@ -214,7 +209,7 @@ public class Bot
 
                     try
                     {
-                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                        await sender.SendMessageAsync(channelToMessage, noticeRoleCreationEmbed);
                     }
                     catch (Exception exception)
                     {
@@ -240,18 +235,18 @@ public class Bot
                     {
                         Title = "Creation Of Student Role",
                         Description =
-                            $"A Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
-                            Name = sender.CurrentUser.Username,
+                            Name = sender.CurrentUser.Username
                         },
 
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail()
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                         {
                             Url = sender.CurrentUser.AvatarUrl
                         },
-                        Color = DiscordColor.Gold,
+                        Color = DiscordColor.Gold
                     };
 
                     var guildChannels = guild.Channels.Values;
@@ -260,7 +255,7 @@ public class Bot
 
                     try
                     {
-                        await sender.SendMessageAsync(channelToMessage, embed: noticeRoleCreationEmbed);
+                        await sender.SendMessageAsync(channelToMessage, noticeRoleCreationEmbed);
                     }
                     catch (Exception exception)
                     {
@@ -270,6 +265,7 @@ public class Bot
                 }
             }
         }
+
         return Task.CompletedTask;
     }
 }
