@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Princess.Models;
 using Princess.Services;
-using Princess.CSV;
 
 namespace Princess.Pages.Class;
 
@@ -41,6 +40,7 @@ public class LectureModel : PageModel
         DateSort = sortOrder == "Lecture.Date" ? "date_desc" : "Lecture.Date";
         PresenceCheckbox = sortOrder == "Attended" ? "attended_desc" : "Attended";
         ReasonForAbsence = sortOrder == "ReasonAbsence" ? "reasonAbsence_desc" : "ReasonAbsence";
+
         if (searchString != null)
         {
             pageIndex = 1;
@@ -49,6 +49,7 @@ public class LectureModel : PageModel
         {
             searchString = currentFilter;
         }
+
         CurrentFilter = searchString;
         var lecture = await _presenceHandler.GetLecture(lectureId);
         if (lecture == null)
@@ -90,6 +91,49 @@ public class LectureModel : PageModel
         var pageSize = _configuration.GetValue("PageSize", 10);
         Presences = await PaginatedList<Presence>.CreateAsync(presencesList.ToList(), pageIndex ?? 1, pageSize);
     }
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var lectureIdFromButton = LectureId;
+        var allStudentsFromPresenceCheck = await _presenceHandler.GetLecture(lectureIdFromButton);
+
+        var date = allStudentsFromPresenceCheck.Date;
+        // TODO EXPORT SHOULD BE IN OnGetAsync instead, maybe in a new razor page that redirects back here when export is done?
+        return File(WriteCsvToMemory(allStudentsFromPresenceCheck), "text/csv", $"lecture-{date}.csv");
+    }
+
+    private byte[] WriteCsvToMemory(Lecture data)
+    {
+        var presenceList = data.Presences;
+
+        var testAttendanceList = new List<ExportToCSV>() { };
+
+        foreach (var testStudent in data.Students)
+        {
+            var presence = presenceList.FirstOrDefault(p => p.Student == testStudent);
+            testAttendanceList.Add(new ExportToCSV()
+            {
+                Class = data.Class.Name,
+                Teacher = data.Teacher.Name,
+                Student = testStudent.Name,
+                Date = data.Date,
+                Present = presence.Attended,
+                Reason = presence.ReasonAbsence ?? "",
+            });
+        }
+
+        using (var memoryStream = new MemoryStream())
+        using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+        using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)
+               {
+                   Delimiter = ";",
+               }))
+        {
+            csvWriter.WriteRecords(testAttendanceList);
+            streamWriter.Flush();
+            return memoryStream.ToArray();
+        }
+    }
+
     public class PaginatedList<T> : List<T>
     {
         public int PageIndex { get; private set; }
@@ -111,5 +155,4 @@ public class LectureModel : PageModel
             return Task.FromResult(new PaginatedList<T>(items, count, pageIndex, pageSize));
         }
     }
-
 }

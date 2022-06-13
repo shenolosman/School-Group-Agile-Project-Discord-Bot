@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
 using Princess.Bot.Services;
-using Princess.CSV;
 using Princess.Data;
 using Princess.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -54,6 +52,5 @@ using (var scope = app.Services.CreateScope())
 var bot = new Bot(app.Services);
 
 bot.RunAsync().GetAwaiter();
-
 
 app.Run();

@@ -18,28 +18,35 @@
     ViewData["Title"] = "Home Page";s that the teacher has in the
     Schoolclass dropdown
     *@
+    <div class="col-md-6 me-auto">
         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuTeacherLink" data-bs-toggle="dropdown" aria-expanded="false">
-    Teacher: @lecture.Teacher.Name
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuTeacherLink">
-    @foreach (var teacher in teachers)
-    {
-    <li><a class="dropdown-item" href="#">@teacher.Name</a></li>
-    }
-    </ul>
-    <a class="btn btn-secondary dropdown-toggle ms-2" href="#" role="button" id="dropdownMenuSchoolclassLink" data-bs-toggle="dropdown" aria-expanded="false">
-    Class: @lecture.Class.Name
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuSchoolclassLink">
-    @foreach (var schoolClass in allSchoolClasses)
-    {
-    <li><a class="dropdown-item" href="#">@schoolClass.Name</a></li>
-    }
-    </ul>
-    <div class="col-md-2 offset-4">
-
-        <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
-
+        Teacher: @lecture.Teacher.Name
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuTeacherLink">
+        @foreach (var teacher in teachers)
+        {
+            <li>
+                <a class="dropdown-item" href="#">@teacher.Name</a>
+            </li>
+        }
+        </ul>
+        <a class="btn btn-secondary dropdown-toggle ms-2" href="#" role="button" id="dropdownMenuSchoolclassLink" data-bs-toggle="dropdown" aria-expanded="false">
+        Class: @lecture.Class.Name
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuSchoolclassLink">
+            @foreach (var schoolClass in allSchoolClasses)
+            {
+                <li>
+                    <a class="dropdown-item" href="#">@schoolClass.Name</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="">
+        <Form method="post">
+            <input asp-for="@lectureId" type="hidden">
+            <Button type="submit" class="btn btn-dark">Export to Excel file</Button>
+        </Form>
     </div>
 </div>
 <br />
@@ -55,15 +62,6 @@
         </div>
     </form>
 </div>
-    <Form method="post" >
-    <input asp-for="@lectureId" type="hidden"></input>
-    <Button type="submit" class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file"></Button>
-    </Form>
-</div>
-<div class="ms-auto">
-    
-</div>
-
 
 <table class="table header-table">
     <thead>
