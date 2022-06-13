@@ -29,7 +29,7 @@ The owner/admin of the server need to assign the teachers with the
 
 ### !RegisterTeacher [user]
 
-To run this command you need admin privilege. When ran it gives
+To use this command you need admin privilege. When called it gives
 the user named/mentioned the Teacher role and assigns the person as
 a teacher of the class in the database.
 
@@ -40,10 +40,10 @@ Example: !registerteacher Jakob
 
 ### !Presence [timespan]
 
-When this command is ran on the server, everyone who is not
+When this command is used on the server, everyone who is not
 assigned with the teacher role are registered as students for this class.
 
-To run this command you need the teacher role. When ran it starts
+To use this command you need the teacher role. When ran it starts
 a presence check with a quiz. The students have as long as the 
 teacher specifies in the [timespan] parameter to react with 
 an emoji corresponding to an answer to the question.
@@ -76,10 +76,12 @@ The student is free to avoid the question and simply type "absent"
 if the question is sensitive. Once the user has given a reason the 
 absence is reported.
 
-Should the user change their mind midway they can type !cancel
-in the bot's DM chatt to cancel the command.
+If the user should change their mind midway they can type !cancel
+in the bot's DM chat to cancel the command.
 
 ### !Help [command]
 
 If there is a command you aren't sure of in the future you can always
 use the !help command to find more information on how to use it and what it does.
+
+Example: !help registerteacher
