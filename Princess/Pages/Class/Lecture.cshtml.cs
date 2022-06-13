@@ -8,95 +8,108 @@ using Princess.Models;
 using Princess.Services;
 using Princess.CSV;
 
-namespace Princess.Pages.Class
+namespace Princess.Pages.Class;
+
+public class LectureModel : PageModel
 {
-    public class LectureModel : PageModel
+
+    private readonly PresenceHandler _presenceHandler;
+    private readonly IConfiguration _configuration;
+
+    public LectureModel(PresenceHandler presenceHandler, IConfiguration configuration)
     {
-        private readonly PresenceHandler _presenceHandler;
+        _presenceHandler = presenceHandler;
+        _configuration = configuration;
+    }
 
-        public LectureModel(PresenceHandler presenceHandler)
+    [BindProperty(SupportsGet = true)]
+    public int LectureId { get; set; }
+    public PaginatedList<Presence> Presences { get; set; }
+    public string StudentSort { get; set; }
+    public string DateSort { get; set; }
+    public string PresenceCheckbox { get; set; }
+    public string ReasonForAbsence { get; set; }
+    public string CurrentFilter { get; set; }
+    public string CurrentSort { get; set; }
+
+    public async Task OnGetAsync(string sortOrder, string currentFilter, string searchString, int? pageIndex, int lectureId)
+    {
+        //sorting with pagination
+        CurrentSort = sortOrder;
+        CurrentFilter = currentFilter;
+        StudentSort = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        DateSort = sortOrder == "Lecture.Date" ? "date_desc" : "Lecture.Date";
+        PresenceCheckbox = sortOrder == "Attended" ? "attended_desc" : "Attended";
+        ReasonForAbsence = sortOrder == "ReasonAbsence" ? "reasonAbsence_desc" : "ReasonAbsence";
+        if (searchString != null)
         {
-            _presenceHandler = presenceHandler;
+            pageIndex = 1;
         }
-
-        [BindProperty(SupportsGet = true)] 
-        public int LectureId { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public int CurrentPage { get; set; } = 1;
-        public int Count { get; set; }
-        public int PageSize { get; set; } = 10;
-
-        public int TotalPages => (int) Math.Ceiling(decimal.Divide(Count, PageSize));
-
-        public List<Student> Students { get; set; }
-
-
-        public async Task OnGetAsync()
+        else
         {
-            Students = await GetPaginatedResult(LectureId, CurrentPage, PageSize);
-            Count = await GetCount(LectureId);
+            searchString = currentFilter;
         }
-        public async Task <IActionResult>  OnPostAsync()
+        CurrentFilter = searchString;
+        var lecture = await _presenceHandler.GetLecture(lectureId);
+        if (lecture == null)
         {
-            var lectureIdFromButton = LectureId;
-            var allStudentsFromPresenceCheck = await _presenceHandler.GetLectureAsync(lectureIdFromButton);
-
-            var date = allStudentsFromPresenceCheck.Date;
-            // TODO EXPORT SHOULD BE IN OnGetAsync instead
-            return File(WriteCsvToMemory(allStudentsFromPresenceCheck), "text/csv", $"lecture-{date}.csv");
+            return;
         }
-
-        private byte[] WriteCsvToMemory(Lecture data)
+        IEnumerable<Presence> presencesList = lecture.Presences.ToList();
+        if (!string.IsNullOrEmpty(searchString))
         {
-            var presenceList = data.Presences;
-
-            var testAttendanceList = new List<ExportToCSV>() { };
-
-            foreach (var testStudent in data.Students)
-            {
-                var presence = presenceList.FirstOrDefault(p => p.Student == testStudent);
-                testAttendanceList.Add(new ExportToCSV()
-                {
-                    theClass = data.Class.Name,
-                    teacher = data.Teacher.Name,
-                    student = testStudent.Name,
-                    registerTime = data.Date,
-                    presence = presence.Attended,
-                });
-            }
-
-            using (var memoryStream = new MemoryStream())
-            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
-            using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)
-                   {
-                       Delimiter = ";",
-                   }))
-            {
-                csvWriter.WriteRecords(testAttendanceList);
-                streamWriter.Flush();
-                return memoryStream.ToArray();
-            }
+            presencesList = presencesList.Where(s => s.Student.Name.ToLower().Contains(searchString));
         }
-
-        private async Task<List<Student>> GetPaginatedResult(int lectureId, int currentPage, int pageSize = 10)
+        switch (sortOrder)
         {
-            var lecture = await _presenceHandler.GetLectureAsync(lectureId);
-
-            var students = lecture.Students.ToList();
-
-            return students.OrderBy(s => s.Name).Skip((currentPage - 1) * PageSize).Take(pageSize).ToList();
+            case "name_desc":
+                presencesList = presencesList.OrderByDescending(s => s.Student.Name);
+                break;
+            case "Date":
+                presencesList = presencesList.OrderBy(x => x.Lecture.Date);
+                break;
+            case "date_desc":
+                presencesList = presencesList.OrderByDescending(s => s.Lecture.Date);
+                break;
+            case "Attended":
+                presencesList = presencesList.OrderBy(s => s.Attended);
+                break;
+            case "attended_desc":
+                presencesList = presencesList.OrderByDescending(s => s.Attended);
+                break;
+            case "ReasonAbsence":
+                presencesList = presencesList.OrderBy(s => s.ReasonAbsence);
+                break;
+            case "reasonAbsence_desc":
+                presencesList = presencesList.OrderByDescending(s => s.ReasonAbsence);
+                break;
+            default:
+                presencesList = presencesList.OrderBy(s => s.Student.Name);
+                break;
         }
-
-        private async Task<int> GetCount(int lectureId)
+        var pageSize = _configuration.GetValue("PageSize", 10);
+        Presences = await PaginatedList<Presence>.CreateAsync(presencesList.ToList(), pageIndex ?? 1, pageSize);
+    }
+    public class PaginatedList<T> : List<T>
+    {
+        public int PageIndex { get; private set; }
+        public int TotalPages { get; private set; }
+        public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
         {
-            var lecture = await _presenceHandler.GetLectureAsync(lectureId);
-            var amountOfStudents = lecture.Students.Count;
+            PageIndex = pageIndex;
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize);
 
-            if (lecture == null)
-                return 0;
-
-            return amountOfStudents;
+            this.AddRange(items);
+        }
+        public static Task<PaginatedList<T>> CreateAsync(
+            List<T> source, int pageIndex, int pageSize)
+        {
+            var count = source.Count();
+            var items = source.Skip(
+                    (pageIndex - 1) * pageSize)
+                .Take(pageSize).ToList();
+            return Task.FromResult(new PaginatedList<T>(items, count, pageIndex, pageSize));
         }
     }
+
 }

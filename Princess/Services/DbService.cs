@@ -14,13 +14,14 @@ public class DbService
 
     public async Task SeedAsync()
     {
-        var classWin21 = new Class { Id = 1, Name = "Win21", Teachers = new List<Teacher>()};
-        var classWin20 = new Class { Id = 2, Name = "Win20", Teachers = new List<Teacher>()};
+        var classWin21 = new Class { Id = 11111111111, Name = "Win21", Teachers = new List<Teacher>() };
+        var classWin20 = new Class { Id = 22222222222, Name = "Win20", Teachers = new List<Teacher>() };
 
         var teacher = new List<Teacher>
         {
-            new() { Id = 1,Name = "Björn"},
-            new() { Id = 2,Name = "Pernilla"}
+            new() { Id = 111111,Name = "Björn"},
+            new() { Id = 222222,Name = "Pernilla"},
+            new() { Id = 333333,Name = "Markus"},
         };
 
         var students = new List<Student>
@@ -63,14 +64,24 @@ public class DbService
             new() {Date = DateTime.Today.AddDays(-3), Class = classWin21, Teacher = teacher[0]},
             new() {Date = DateTime.Today.AddDays(-4), Class = classWin21, Teacher = teacher[0]},
             new() {Date = DateTime.Today.AddDays(-5), Class = classWin21, Teacher = teacher[0]},
-            new() {Date = DateTime.Today.AddDays(-6), Class = classWin21, Teacher = teacher[0]}
+            new() {Date = DateTime.Today.AddDays(-6), Class = classWin21, Teacher = teacher[0]},
+            new() {Date = DateTime.Today, Class = classWin20, Teacher = teacher[2]},
+        };
+
+        var presencesForTodayWithMarkus = new List<Presence>
+        {
+            new() {Attended = true, Student = studentsClass2[0], Lecture = lectures[9], ReasonAbsence = null},
+            new() {Attended = true, Student = studentsClass2[1], Lecture = lectures[9], ReasonAbsence = null},
+            new() {Attended = false, Student = studentsClass2[2], Lecture = lectures[9], ReasonAbsence = "no reason blabalbl.."},
+            new() {Attended = false, Student = studentsClass2[3], Lecture = lectures[9], ReasonAbsence = "reason babababalblablba....."},
+            new() {Attended = false, Student = studentsClass2[4], Lecture = lectures[9], ReasonAbsence = null},
         };
 
         var presencesForToday = new List<Presence>
         {
             new() {Attended = true, Student = students[0], Lecture = lectures[0], ReasonAbsence = null},
             new() {Attended = true, Student = students[1], Lecture = lectures[0], ReasonAbsence = null},
-            new() {Attended = false, Student = students[2], Lecture = lectures[0], ReasonAbsence = "reason 1"},
+            new() {Attended = false, Student = students[2], Lecture = lectures[0], ReasonAbsence = "A very long reason why I am not present today.."},
             new() {Attended = false, Student = students[3], Lecture = lectures[0], ReasonAbsence = "reason 2"},
             new() {Attended = false, Student = students[4], Lecture = lectures[0], ReasonAbsence = null},
             new() {Attended = true, Student = students[5], Lecture = lectures[0], ReasonAbsence = null},
@@ -177,11 +188,18 @@ public class DbService
 
         classWin21.Teachers.Add(teacher[0]);
         classWin20.Teachers.Add(teacher[1]);
+        classWin20.Teachers.Add(teacher[2]);
 
         lectures[0].Students = students;
         lectures[2].Students = students;
         lectures[1].Students = studentsClass2;
         lectures[3].Students = studentsClass2;
+        lectures[4].Students = students;
+        lectures[5].Students = students;
+        lectures[6].Students = students;
+        lectures[7].Students = students;
+        lectures[8].Students = students;
+        lectures[9].Students = studentsClass2;
 
         await _ctx.AddRangeAsync(classWin20);
         await _ctx.AddRangeAsync(classWin21);
@@ -197,6 +215,7 @@ public class DbService
         await _ctx.AddRangeAsync(presencesLast4Day);
         await _ctx.AddRangeAsync(presencesLast5Day);
         await _ctx.AddRangeAsync(presencesLast6Day);
+        await _ctx.AddRangeAsync(presencesForTodayWithMarkus);
 
         await _ctx.SaveChangesAsync();
     }
@@ -207,6 +226,13 @@ public class DbService
     }
 
     public async Task RecreateAsync()
+    {
+        await _ctx.Database.EnsureDeletedAsync();
+        await _ctx.Database.EnsureCreatedAsync();
+
+    }
+
+    public async Task RecreateAndSeedAsync()
     {
         await _ctx.Database.EnsureDeletedAsync();
         await _ctx.Database.EnsureCreatedAsync();
