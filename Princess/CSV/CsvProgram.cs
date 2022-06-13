@@ -1,20 +1,23 @@
 ﻿using LINQtoCSV;
-using Princess.Data;
+using Microsoft.AspNetCore.Mvc;
 using Princess.Models;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Princess.CSV
 {
     public class CsvProgram
     {
-
-        public CsvProgram(string data)
+         
+        public CsvProgram(int data)
         {
+            int _data = data;
 
-            WriteToCsvFile();
-            string _data = data;
+            WriteToCsvFile(_data);
         }
         
-        public static void WriteToCsvFile()
+        public static async void WriteToCsvFile(int _data)
         {
             var attendenceList = new List<ExportToCSV>()
             {
@@ -27,10 +30,19 @@ namespace Princess.CSV
                 SeparatorChar = '\u002C',
             };
 
-            var csvContext = new CsvContext();
-            csvContext.Write(attendenceList, "csvfilename.csv", csvFileDescription);
-            Console.WriteLine("CSV file created");
+            string rootDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var fileOnServer = Path.Combine(rootDirectory, "ExportFile.csv");
 
+            var csvContext = new CsvContext();
+            
+              csvContext.Write(attendenceList, fileOnServer, csvFileDescription);
+
+            var  launchSettingURLArray = Environment.GetEnvironmentVariable("ASPNETCORE_URLS").Split(";");
+            var launchSettingURLWithExportFile = launchSettingURLArray[0] ;
+
+            string testpath = ;
+               
         }
+
     }
 }

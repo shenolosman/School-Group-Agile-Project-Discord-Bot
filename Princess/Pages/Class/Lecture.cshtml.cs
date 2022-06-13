@@ -38,7 +38,7 @@ namespace Princess.Pages.Class
         {
             var lectureIdFromButton = LectureId;
             var allStudentsFromPresenceCheck = await _presenceHandler.GetLectureAsync(lectureIdFromButton);
-            var csvCreateFile = new CsvProgram("test");
+            var csvCreateFile = new CsvProgram(LectureId);
             
            
 
