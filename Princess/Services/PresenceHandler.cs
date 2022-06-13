@@ -46,14 +46,14 @@ public class PresenceHandler
         await _ctx.SaveChangesAsync();
     }
 
-    public async Task<Lecture> GetLecture(int id)
+    public async Task<Lecture> GetLecture(int lectureId)
     {
         return await _ctx.Lectures
             .Include(l => l.Students)
             .ThenInclude(s => s.Presences)
             .Include(l => l.Class)
             .Include(l => l.Teacher)
-            .Where(l => l.Id == id)
+            .Where(l => l.Id == lectureId)
             .FirstOrDefaultAsync();
     }
 
