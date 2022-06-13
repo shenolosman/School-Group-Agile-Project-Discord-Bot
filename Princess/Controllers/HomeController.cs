@@ -24,7 +24,7 @@ namespace Princess.Controllers
         [HttpPost]
         public async Task<JsonResult> GetTeachersClass(string classId, string ddType) //ddType= dropdownType
         {
-            var allClassList = await _presenceHandler.GetAllSchoolclasses();
+            var allClassList = await _presenceHandler.GetAllClasses();
             List<SelectListItem> result = new List<SelectListItem>();
             bool isSucceed = true;
             try
