@@ -1,4 +1,4 @@
-@using Princess.Services
+﻿@using Princess.Services
 @inject PresenceHandler _presenceHandler
 @{
     ViewData["Title"] = "Home Page";
@@ -11,6 +11,80 @@
         Home Pr3s3nc3
     </h1>
     <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
-    <a asp-page="/Class/Lecture" asp-route-LectureId="1"class="page-link">Lecture 1 RazorPage</a>
+    <a asp-page="/Class/Lecture" asp-route-LectureId="1" class="page-link">Lecture 1 RazorPage</a>
 </div>
 
+<div class="col-md-6 d-flex">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>class</label>
+            <select class="form-control" name="classes" id="schoolClasses">
+                <option value="0">Select Class</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <label>teacher</label>
+        <select class="form-control" name="teachers" id="schoolTeacher" disabled>
+            <option value="0">Select Class First</option>
+        </select>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function() {
+            $.ajaxSetup({
+                type: "post",
+                url: "/Home/GetTeachersClass",
+                dataType: "json"
+            });
+            $.extend({
+                getClass: function() {
+                    $.ajax({
+                        data: { "ddType": "getClass" },
+                        success: function(resultData) {
+                            if (resultData.ok) {
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolClasses").append(optionHtml);
+                                });
+                            } else {
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolClasses").append(optionHtml);
+                                });
+                            }
+                        }
+                    });
+                },
+                getTeacher: function(classId) {
+                    $.ajax({
+                        data: {"classId": classId, "ddType": "getTeacher" },
+                        success: function(resultData) {
+                            $("#schoolTeacher option").remove();
+                            if (resultData.ok) {
+                                $("#schoolTeacher").prop("disabled", false);
+                                $.each(resultData.text,
+                                    function(index, item) {
+                                        const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                        $("#schoolTeacher").append(optionHtml);
+                                    });
+                            } else {
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolTeacher").append(optionHtml);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+            $.getClass();
+            $("#schoolClasses").on("change", function() {
+                var classId = $(this).val();
+                $.getTeacher(classId);
+            });
+        });
+    </script>
+}

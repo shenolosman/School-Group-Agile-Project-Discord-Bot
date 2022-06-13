@@ -1,88 +1,105 @@
-﻿@page "{LectureId:Int}"
+@page "{LectureId:Int}"
 @using Princess.Services
 @model Princess.Pages.Class.LectureModel
-
 @inject PresenceHandler _presenceHandler
 @{
     ViewData["Title"] = "Home Page";
     ViewData["Header-title"] = "Pr3s3nc3 Overview";
 
     int lectureId = Model.LectureId;
-
     var lecture = await _presenceHandler.GetLecture(lectureId);
     var presenceList = lecture.Presences;
     var allSchoolClasses = await _presenceHandler.GetAllClasses();
     var teachers = await _presenceHandler.GetAllTeachers();
-    
 }
-<br/>
-<div class="dropdown d-flex me-auto">
-    @*Right now nothing changes when choosing a different teacher, this is only layout. In Future when you click a teacher in dropdown, show only the classes that the teacher has in the 
-        Schoolclass dropdown
+<br />
+
+<div class="d-flex mx-auto">
+    @*Right now nothing changes when choosing a different teacher, this is only layout. In Future when you click a teacher in dropdown, show only the classes that the teacher has in the
+    Schoolclass dropdown
     *@
-    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuTeacherLink" data-bs-toggle="dropdown" aria-expanded="false">
-        Teacher: @lecture.Teacher.Name
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuTeacherLink" data-bs-toggle="dropdown" aria-expanded="false">
+    Teacher: @lecture.Teacher.Name
     </a>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuTeacherLink">
-        @foreach (var teacher in teachers)
-        {
-            <li><a class="dropdown-item" href="#">@teacher.Name</a></li>
-        }
+    @foreach (var teacher in teachers)
+    {
+    <li><a class="dropdown-item" href="#">@teacher.Name</a></li>
+    }
     </ul>
     <a class="btn btn-secondary dropdown-toggle ms-2" href="#" role="button" id="dropdownMenuSchoolclassLink" data-bs-toggle="dropdown" aria-expanded="false">
-        Class: @lecture.Class.Name
+    Class: @lecture.Class.Name
     </a>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuSchoolclassLink">
-        @foreach (var schoolClass in allSchoolClasses)
-        {
-            <li><a class="dropdown-item" href="#">@schoolClass.Name</a></li>
-        }
+    @foreach (var schoolClass in allSchoolClasses)
+    {
+    <li><a class="dropdown-item" href="#">@schoolClass.Name</a></li>
+    }
     </ul>
-    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
-</div>
-<div class="ms-auto">
-    
-</div>
+    <div class="col-md-2 offset-4">
 
+        <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
 
+    </div>
+</div>
+<br />
+<br />
+<div class="mx-auto">
+    <form asp-page="/Class/Lecture" method="get">
+        <div class="form-actions no-color">
+            <p>
+                Find by student name:
+                <input type="text" name="searchString" value="@Model.CurrentFilter" />
+                <input type="submit" value="Search" class="btn btn-primary" />
+            </p>
+        </div>
+    </form>
+</div>
 <table class="table header-table">
     <thead>
-    <tr>
-        <th class="tdSize" scope="col">Student</th>
-        <th class="tdSize" scope="col">Date</th>
-        <th class="tdSize" scope="col">Present</th>
-        <th class="tdSize-extended" scope="col">Reason for absence</th>
-    </tr>
+        <tr>
+            <th class="tdSize" scope="col"><a asp-page="/Class/Lecture" asp-route-sortOrder="@Model.StudentSort" asp-route-currentFilter="@Model.CurrentFilter">Students Name</a></th>
+            <th class="tdSize" scope="col"><a asp-page="/Class/Lecture" asp-route-sortOrder="@Model.DateSort" asp-route-currentFilter="@Model.CurrentFilter">Lecture Date</a></th>
+            <th class="tdSize" scope="col"><a asp-page="/Class/Lecture" asp-route-sortOrder="@Model.PresenceCheckbox" asp-route-currentFilter="@Model.CurrentFilter">Present</a></th>
+            <th class="tdSize-extended" scope="col"><a asp-page="/Class/Lecture" asp-route-sortOrder="@Model.ReasonForAbsence" asp-route-currentFilter="@Model.CurrentFilter">Reason for absence</a></th>
+        </tr>
     </thead>
 </table>
-@foreach (var student in Model.Students)
-{
-    var presence = presenceList.FirstOrDefault(p => p.Student == student);
+<table class="table bg-table ctx-table">
+    <tbody>
+        @if (Model.Presences == null)
+        {
+            <tr>No Data</tr>
+        }
+        else
+        {
+            @foreach (var item in Model.Presences)
+            {
+                //var presence = presenceList.FirstOrDefault(p => p.Student == student);
+                <tr>
+                    <td class="tdSize">@Html.DisplayFor(modelItem => item.Student.Name)</td>
+                    <td class="tdSize">@Html.DisplayFor(modelItem => item.Lecture.Date)</td>
+                    @if (item.Attended)
+                    {
+                        <td class="tdSize"><img src="~/img/checked-green.png" width="28px" /></td>
+                    }
+                    else
+                    {
+                        <td class="tdSize"></td>
+                    }
+                    <td class="tdSize-extended">@Html.DisplayFor(modelItem => item.ReasonAbsence)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
 
-    <table class="table bg-table ctx-table">
-        <tbody>
-        <tr>
-            <td class="tdSize">@student.Name</td>
-            <td class="tdSize">@lecture.Date.ToShortDateString()</td>
-            @if (@presence.Attended == true)
-            {
-                <td class="tdSize"><img src="~/img/checked-green.png" width="28px"/></td>
-            }
-            else
-            {
-                <td class="tdSize"></td>
-            }
-            <td class="tdSize-extended">@presence.ReasonAbsence</td>
-        </tr>
-        </tbody>
-    </table>
-}
 <div>
     <ul class="pagination">
-        @for (var i = 1; i <= Model.TotalPages; i++)
+        @for (var i = 1; i <= Model.Presences.TotalPages; i++)
         {
-            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                <a asp-page="/Class/Lecture" asp-route-CurrentPage="@i" asp-route-LectureId="@Model.LectureId"class="page-link">@i</a>
+            <li class="page-item @(i == Model.Presences.PageIndex ? "active" : "")">
+                <a asp-page="/Class/Lecture" asp-route-pageIndex="@i" asp-route-sortOrder="@Model.CurrentSort" asp-route-currentFilter="@Model.CurrentFilter" asp-route-LectureId="@Model.LectureId" class="page-link">@i</a>
             </li>
         }
     </ul>
