@@ -1,4 +1,4 @@
-﻿@page "{LectureId:Int}"
+@page "{LectureId:Int}"
 @using Princess.Services
 @model Princess.Pages.Class.LectureModel
 @inject PresenceHandler _presenceHandler
@@ -7,9 +7,9 @@
     ViewData["Header-title"] = "Pr3s3nc3 Overview";
 
     int lectureId = Model.LectureId;
-    var lecture = await _presenceHandler.GetLectureAsync(lectureId);
+    var lecture = await _presenceHandler.GetLecture(lectureId);
     var presenceList = lecture.Presences;
-    var allSchoolClasses = await _presenceHandler.GetAllSchoolclasses();
+    var allSchoolClasses = await _presenceHandler.GetAllClasses();
     var teachers = await _presenceHandler.GetAllTeachers();
 }
 <br />

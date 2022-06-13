@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Princess.Models;
 using Princess.Services;
 
-namespace Princess.Pages.Class
+namespace Princess.Pages.Class;
+
+public class LectureModel : PageModel
 {
-    public class LectureModel : PageModel
+    private readonly PresenceHandler _presenceHandler;
+
+    public LectureModel(PresenceHandler presenceHandler)
     {
         private readonly PresenceHandler _presenceHandler;
         private readonly IConfiguration _configuration;
