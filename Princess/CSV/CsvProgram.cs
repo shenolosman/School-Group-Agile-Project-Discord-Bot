@@ -10,19 +10,36 @@ namespace Princess.CSV
     public class CsvProgram
     {
          
-        public CsvProgram(int data)
+        public CsvProgram(Lecture lectureData)
         {
-            int _data = data;
+            Lecture _lectureData = lectureData;
 
-            WriteToCsvFile(_data);
+            WriteToCsvFile(_lectureData);
         }
         
-        public static async void WriteToCsvFile(int _data)
+        public void WriteToCsvFile(Lecture _data)
         {
             var attendenceList = new List<ExportToCSV>()
             {
                 new ExportToCSV{student = "Anna bengtsson", presence = true, registerTime=DateTime.UtcNow, teacher="Mr.Bjorn", theClass="win21" }
             };
+
+            var presenceList = _data.Presences;
+
+            var testAttendanceList = new List<ExportToCSV>() { };
+
+            foreach (var testStudent in _data.Students)
+            {
+                var presence = presenceList.FirstOrDefault(p => p.Student == testStudent);
+                testAttendanceList.Add(new ExportToCSV()
+                {
+                    theClass = _data.Class.Name,
+                    teacher = _data.Teacher.Name,
+                    student = testStudent.Name,
+                    registerTime = _data.Date,
+                    presence = presence.Attended,
+                });
+            }
 
             var csvFileDescription = new CsvFileDescription
             {
@@ -37,12 +54,9 @@ namespace Princess.CSV
             
               csvContext.Write(attendenceList, fileOnServer, csvFileDescription);
 
-            var  launchSettingURLArray = Environment.GetEnvironmentVariable("ASPNETCORE_URLS").Split(";");
-            var launchSettingURLWithExportFile = launchSettingURLArray[0] ;
-
-            string testpath = ;
-               
-        }
+            //var  launchSettingURLArray = Environment.GetEnvironmentVariable("ASPNETCORE_URLS").Split(";");
+            //var launchSettingURLWithExportFile = launchSettingURLArray[0] ;
+            }
 
     }
 }
