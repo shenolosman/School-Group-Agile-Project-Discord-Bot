@@ -45,41 +45,40 @@ namespace Princess.Pages.Class
             }
             CurrentFilter = searchString;
             var lecture = await _presenceHandler.GetLectureAsync(lectureId);
-            IEnumerable<Presence> PresencesIQ = lecture.Presences.ToList();
-            ViewData["List"] = PresencesIQ;
+            IEnumerable<Presence> presencesList = lecture.Presences.ToList();
             if (!string.IsNullOrEmpty(searchString))
             {
-                PresencesIQ = PresencesIQ.Where(s => s.Student.Name.ToLower().Contains(searchString));
+                presencesList = presencesList.Where(s => s.Student.Name.ToLower().Contains(searchString));
             }
             switch (sortOrder)
             {
                 case "name_desc":
-                    PresencesIQ = PresencesIQ.OrderByDescending(s => s.Student.Name);
+                    presencesList = presencesList.OrderByDescending(s => s.Student.Name);
                     break;
                 case "Date":
-                    PresencesIQ = PresencesIQ.OrderBy(x => x.Lecture.Date);
+                    presencesList = presencesList.OrderBy(x => x.Lecture.Date);
                     break;
                 case "date_desc":
-                    PresencesIQ = PresencesIQ.OrderByDescending(s => s.Lecture.Date);
+                    presencesList = presencesList.OrderByDescending(s => s.Lecture.Date);
                     break;
                 case "Attended":
-                    PresencesIQ = PresencesIQ.OrderBy(s => s.Attended);
+                    presencesList = presencesList.OrderBy(s => s.Attended);
                     break;
                 case "attended_desc":
-                    PresencesIQ = PresencesIQ.OrderByDescending(s => s.Attended);
+                    presencesList = presencesList.OrderByDescending(s => s.Attended);
                     break;
                 case "ReasonAbsence":
-                    PresencesIQ = PresencesIQ.OrderBy(s => s.ReasonAbsence);
+                    presencesList = presencesList.OrderBy(s => s.ReasonAbsence);
                     break;
                 case "reasonAbsence_desc":
-                    PresencesIQ = PresencesIQ.OrderByDescending(s => s.ReasonAbsence);
+                    presencesList = presencesList.OrderByDescending(s => s.ReasonAbsence);
                     break;
                 default:
-                    PresencesIQ = PresencesIQ.OrderBy(s => s.Student.Name);
+                    presencesList = presencesList.OrderBy(s => s.Student.Name);
                     break;
             }
             var pageSize = _configuration.GetValue("PageSize", 10);
-            Presences = await PaginatedList<Presence>.CreateAsync(PresencesIQ.ToList(), pageIndex ?? 1, pageSize);
+            Presences = await PaginatedList<Presence>.CreateAsync(presencesList.ToList(), pageIndex ?? 1, pageSize);
         }
         public class PaginatedList<T> : List<T>
         {
@@ -92,8 +91,6 @@ namespace Princess.Pages.Class
 
                 this.AddRange(items);
             }
-            public bool HasPreviousPage => PageIndex > 1;
-            public bool HasNextPage => PageIndex < TotalPages;
             public static Task<PaginatedList<T>> CreateAsync(
                 List<T> source, int pageIndex, int pageSize)
             {

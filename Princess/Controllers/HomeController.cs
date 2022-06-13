@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-//using System.Web.WebPages.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Princess.Models;
 using Princess.Services;
@@ -23,7 +22,7 @@ namespace Princess.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<JsonResult> GetTeachersClass(string classId, string ddType)
+        public async Task<JsonResult> GetTeachersClass(string classId, string ddType) //ddType= dropdownType
         {
             var allClassList = await _presenceHandler.GetAllSchoolclasses();
             List<SelectListItem> result = new List<SelectListItem>();
