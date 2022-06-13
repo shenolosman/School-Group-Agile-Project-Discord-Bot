@@ -20,10 +20,13 @@ public class AdminCommands : BaseCommandModule
         {
             await using var scope = cmdCtx.Services.CreateAsyncScope();
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
-            var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
+            //var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
+            var classId = cmdCtx.Guild.Id;
+            var teacherId = newTeacher.Id;
+            var teacherName = newTeacher.Nickname ?? newTeacher.Username;
 
             //return and send message if the teacher already exists in db
-            if (await presenceHandler.TeacherExists(newTeacher.Id, classToAdd))
+            if (await presenceHandler.TeacherExistsInClass(teacherId, classId))
             {
                 var failedEmbed = new DiscordEmbedBuilder
                 {
@@ -48,13 +51,13 @@ public class AdminCommands : BaseCommandModule
             var serverRoles = cmdCtx.Guild.Roles;
 
             //deletes student role if exists
-            if (await presenceHandler.StudentExists(newTeacher.Id, classToAdd))
+            if (await presenceHandler.StudentExistsInClass(teacherId, classId))
             {
                 foreach (var role in serverRoles)
                     if (role.Value.Name == "Student")
                         await newTeacher.RevokeRoleAsync(role.Value);
 
-                await presenceHandler.RemoveStudentFromClassInDb(newTeacher.Id, classToAdd);
+                await presenceHandler.RemoveStudentFromClass(teacherId, classId);
             }
 
             //sets the teacher role
@@ -65,7 +68,7 @@ public class AdminCommands : BaseCommandModule
             var newTeacherEmbed = new DiscordEmbedBuilder
             {
                 Title = "New Teacher!",
-                Description = $"{newTeacher.Nickname ?? newTeacher.Username} is now a teacher!",
+                Description = $"{teacherName} is now a teacher!",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = cmdCtx.User.AvatarUrl,
@@ -79,7 +82,7 @@ public class AdminCommands : BaseCommandModule
                 Color = DiscordColor.Gold
             };
 
-            await presenceHandler.RegisterTeacherToDatabase(newTeacher, classToAdd);
+            await presenceHandler.RegisterNewTeacher(teacherId, teacherName, classId);
 
             await cmdCtx.Message.Channel.SendMessageAsync(newTeacherEmbed);
         }
