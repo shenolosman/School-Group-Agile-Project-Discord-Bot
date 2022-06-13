@@ -18,7 +18,9 @@
     <div class="col-md-6">
         <div class="form-group">
             <label>class</label>
-            <select class="form-control" name="classes" id="schoolClasses"></select>
+            <select class="form-control" name="classes" id="schoolClasses">
+                <option value="0">Select Class</option>
+            </select>
         </div>
     </div>
     <div class="col-md-6">
@@ -29,87 +31,60 @@
     </div>
 </div>
 
-
 @section Scripts{
     <script type="text/javascript">
         $(function() {
-            window.$.ajaxSetup({
+            $.ajaxSetup({
                 type: "post",
                 url: "/Home/GetTeachersClass",
                 dataType: "json"
             });
-            window.$.extend({
+            $.extend({
                 getClass: function() {
-                    window.$.ajax({
+                    $.ajax({
                         data: { "ddType": "getClass" },
                         success: function(resultData) {
                             if (resultData.ok) {
-                                window.$.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-                                    window.$("#schoolClasses").append(optionHtml);
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolClasses").append(optionHtml);
                                 });
                             } else {
-                                window.$.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-                                    window.$("#schoolClasses").append(optionHtml);
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolClasses").append(optionHtml);
                                 });
                             }
                         }
                     });
                 },
-                //without classid 
-                getTeacher: function() {
-                    window.$.ajax({
-                        data: { "ddType": "getTeacher" },
+                getTeacher: function(classId) {
+                    $.ajax({
+                        data: {"classId": classId, "ddType": "getTeacher" },
                         success: function(resultData) {
-                            window.$("#schoolTeacher option").remove();
+                            $("#schoolTeacher option").remove();
                             if (resultData.ok) {
-                                window.$("#schoolTeacher").prop("disabled", false);
-                                window.$.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-                                    window.$("#schoolTeacher").append(optionHtml);
-                                });
+                                $("#schoolTeacher").prop("disabled", false);
+                                $.each(resultData.text,
+                                    function(index, item) {
+                                        const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                        $("#schoolTeacher").append(optionHtml);
+                                    });
                             } else {
-                                window.$.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-                                    window.$("#schoolTeacher").append(optionHtml);
+                                $.each(resultData.text, function(index, item) {
+                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                    $("#schoolTeacher").append(optionHtml);
                                 });
                             }
                         }
                     });
                 }
             });
-            window.$.getClass();
-            window.$("#schoolClasses").on("change", function() {
-                window.$.getTeacher();
+            $.getClass();
+            $("#schoolClasses").on("change", function() {
+                var classId = $(this).val();
+                $.getTeacher(classId);
             });
-            //with classid method and u have to put it as parameter int classId in actionmethod
-            //    getTeacher: function(classId) {
-            //        window.$.ajax({
-            //            data: { "classId": classId, "ddType": "getTeacher" },
-            //            success: function(resultData) {
-            //                window.$("#schoolTeacher option").remove();
-            //                if (resultData.ok) {
-            //                    window.$("#schoolTeacher").prop("disabled", false);
-            //                    window.$.each(resultData.text, function(index, item) {
-            //                        const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-            //                        window.$("#schoolTeacher").append(optionHtml);
-            //                    });
-            //                } else {
-            //                    window.$.each(resultData.text, function(index, item) {
-            //                        const optionHtml = `<option value="${item.Value}">${item.Text}</option>`;
-            //                        window.$("#schoolTeacher").append(optionHtml);
-            //                    });
-            //                }
-            //            }
-            //        });
-            //    }
-            //});
-            //window.$.getClass();
-            //window.$("#schoolClasses").on("change", function() {
-            //    var classId = window.$(this).val();
-            //    window.$.getTeacher(classId);
-            //});
         });
     </script>
 }

@@ -23,7 +23,7 @@ namespace Princess.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<JsonResult> GetTeachersClass(string ddType)
+        public async Task<JsonResult> GetTeachersClass(string classId, string ddType)
         {
             var allClassList = await _presenceHandler.GetAllSchoolclasses();
             List<SelectListItem> result = new List<SelectListItem>();
@@ -43,9 +43,8 @@ namespace Princess.Controllers
                         }
                         break;
                     case "getTeacher":
-                        foreach (var secondDropdown in allClassList)
+                        foreach (var secondDropdown in allClassList.Where(x => x.Id == ulong.Parse(classId)))
                         {
-                            //trying to get teacher by classid with secondDropdown.Teachers.Where(x => x.Id == (ulong)classId) but nothing came
                             foreach (var item in secondDropdown.Teachers)
                             {
                                 result.Add(new SelectListItem
