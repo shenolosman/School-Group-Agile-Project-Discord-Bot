@@ -29,7 +29,7 @@ The owner/admin of the server need to assign the teachers with the
 
 ### !RegisterTeacher [user]
 
-To run this command you need admin privilege. When run it gives
+To run this command you need admin privilege. When ran it gives
 the user named/mentioned the Teacher role and assigns the person as
 a teacher of the class in the database.
 
@@ -38,12 +38,12 @@ of the user in the [user] parameter.
 
 Example: !registerteacher Jakob
 
-### !Attendance [timespan]
+### !Presence [timespan]
 
-The first time this command is run on the server, everyone who is not
+The first time this command is ran on the server, everyone who is not
 assigned with the teacher role are registered as students for this class.
 
-To run this command you need the teacher role. When run it starts
+To run this command you need the teacher role. When ran it starts
 a presence check with a quiz. The students have as long as the 
 teacher specifies in the [timespan] parameter to react with 
 an emoji corresponding to an answer to the question.
@@ -54,20 +54,20 @@ Otherwise they will be marked as absent.
 The [timespan] needs to specify if the time is in seconds, minutes
 or hours.
 
-Example: !attendance 15s </br>
+Example: !presence 15s </br>
 This creates a timespan of 15 seconds.
 
-Example: !attendance 15m </br>
+Example: !presence 15m </br>
 This creates a timespan of 15 minutes.
 
-Example: !attendance 15h </br>
+Example: !presence 15h </br>
 This creates a timespan of 15 hours.
 
 ### !Absence
 
 This command requires the student role to use. The student can 
 report absence for the day. Currently this needs to be done before the
-!Attendance check.
+!presence check.
 
 When called, the bot deletes the message from the channel so that
 the student can report without worrying that others will notice.
