@@ -99,3 +99,26 @@ input#presence_Attended {
     width: 23px;
     height: 23px;
 }
+a {
+    color: #ffffff;
+    text-decoration: none;
+}
+    a:hover {
+        color: #a0b6b0;
+        border-color: #dee2e6;
+    }
+.btn-primary {
+    color: #fff;
+    background-color: #a0b6b0;
+    border-color: #dee2e6;
+}
+    .btn-primary:hover {
+        background-color: rgb(50, 72, 92);
+        border-color: #dee2e6;
+    }
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #a0b6b0;
+    border-color: #dee2e6;
+}
