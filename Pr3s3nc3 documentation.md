@@ -40,7 +40,7 @@ Example: !registerteacher Jakob
 
 ### !Presence [timespan]
 
-The first time this command is ran on the server, everyone who is not
+When this command is ran on the server, everyone who is not
 assigned with the teacher role are registered as students for this class.
 
 To run this command you need the teacher role. When ran it starts
