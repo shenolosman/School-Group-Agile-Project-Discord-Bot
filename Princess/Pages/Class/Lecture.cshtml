@@ -94,25 +94,6 @@
     </tbody>
 </table>
 
-@*@{
-    var prevDisabled = !Model.Presences.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.Presences.HasNextPage ? "disabled" : "";
-}
-<a asp-page="/Class/Lecture"
-   asp-route-sortOrder="@Model.CurrentSort"
-   asp-route-pageIndex="@(Model.Presences.PageIndex - 1)"
-   asp-route-currentFilter="@Model.CurrentFilter"
-   class="btn btn-primary @prevDisabled">
-    Previous
-</a>
-<a asp-page="/Class/Lecture"
-   asp-route-sortOrder="@Model.CurrentSort"
-   asp-route-pageIndex="@(Model.Presences.PageIndex + 1)"
-   asp-route-currentFilter="@Model.CurrentFilter"
-   class="btn btn-primary @nextDisabled">
-    Next
-</a>*@
-
 <div>
     <ul class="pagination">
         @for (var i = 1; i <= Model.Presences.TotalPages; i++)
