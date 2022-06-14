@@ -133,7 +133,7 @@
                             if (resultData.length > 0) {
                                 $("#fillTable").prop("hidden", false);
                                 $.each(resultData, function(key, value) {
-                                    $('#fillTable').append(`<tr> <td>${value.student.name}</td>  <td>${value.lecture.date}</td> <td>${value.attended}</td> <td>${value.reasonAbsence}</td></tr>`);
+                                    $('#fillTable').append(`<tr> <td>${value.student.name}</td>  <td>${value.lecture.date.split('T')[0]}</td> <td>${value.attended==true?'<img src="/img/checked-green.png" width="28px"/>':''}</td> <td>${value.reasonAbsence!=null?value.reasonAbsence:''}</td></tr>`);
                                 });
                             } else {
                                 alert("No Data");
