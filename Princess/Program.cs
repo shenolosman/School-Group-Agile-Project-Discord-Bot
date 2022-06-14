@@ -2,11 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
 using Princess.Data;
 using Princess.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbService>();
 builder.Services.AddScoped<PresenceHandler>();

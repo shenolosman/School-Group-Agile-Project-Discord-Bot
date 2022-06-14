@@ -9,27 +9,52 @@
 <div class="d-flex ms-auto">
     <a asp-page="/Class/Lecture" asp-route-LectureId="1" class="btn btn-secondary ms-auto mb-lg-0">Test Overview</a>
 </div>
-
-<div class="col-md-6 d-flex">
-    <div class="col-md-6 me-2">
-        <div class="form-group">
-            <label>Class</label>
-            <select class="form-control" name="classes" id="schoolClasses">
-                <option value="0">Select Class</option>
+<div class="row">
+    <div class="col-md-6 d-flex">
+        <div class="col-md-6 me-2">
+            <div class="form-group">
+                <label>Class</label>
+                <select class="form-control" name="classes" id="schoolClasses">
+                    <option value="0">Select Class</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label>Teacher</label>
+            <select class="form-control" name="teachers" id="schoolTeacher" disabled>
+                <option value="0">Select Class First</option>
             </select>
         </div>
     </div>
-    <div class="col-md-6">
-        <label>Teacher</label>
-        <select class="form-control" name="teachers" id="schoolTeacher" disabled>
-            <option value="0">Select Class First</option>
-        </select>
+    <div class="col-md-6 mt-auto">
+        <button id="getData" hidden="" class="btn btn-secondary">Get Data</button>
     </div>
+</div>
+<br />
+<div class="row">
+    <table id="fillTable" class="table header-table" hidden="">
+        <thead>
+            <tr>
+                <th class="tdSize" scope="col">Student Name</th>
+                <th class="tdSize" scope="col">Lecture Date</th>
+                <th class="tdSize" scope="col">Attended</th>
+                <th class="tdSize" scope="col">Reason Of Absence</th>
+            </tr>
+        </thead>
+        <tbody class="bg-table ctx-table">
+            <tr id="ftr">
+                <td id="ftd0" class="tdSize"></td>
+                <td id="ftd1" class="tdSize"></td>
+                <td id="ftd2" class="tdSize"></td>
+                <td id="ftd3" class="tdSize-extended"></td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 @section Scripts{
     <script type="text/javascript">
-        $(function() {
+        $(document).ready(function() {
             $.ajaxSetup({
                 type: "post",
                 url: "/Home/GetTeachersClass",
@@ -41,45 +66,81 @@
                         data: { "ddType": "getClass" },
                         success: function(resultData) {
                             if (resultData.ok) {
-                                $.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
-                                    $("#schoolClasses").append(optionHtml);
-                                });
+                                $.each(resultData.text,
+                                    function(index, item) {
+                                        const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                        $("#schoolClasses").append(optionHtml);
+                                    });
                             } else {
-                                $.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
-                                    $("#schoolClasses").append(optionHtml);
-                                });
+                                $.each(resultData.text,
+                                    function(index, item) {
+                                        const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                        $("#schoolClasses").append(optionHtml);
+                                    });
                             }
                         }
                     });
                 },
                 getTeacher: function(classId) {
                     $.ajax({
-                        data: {"classId": classId, "ddType": "getTeacher" },
+                        data: { "classId": classId, "ddType": "getTeacher" },
                         success: function(resultData) {
                             $("#schoolTeacher option").remove();
                             if (resultData.ok) {
                                 $("#schoolTeacher").prop("disabled", false);
                                 $.each(resultData.text,
                                     function(index, item) {
+                                        $("#getData").prop("hidden", false);
                                         const optionHtml = `<option value="${item.value}">${item.text}</option>`;
                                         $("#schoolTeacher").append(optionHtml);
                                     });
                             } else {
-                                $.each(resultData.text, function(index, item) {
-                                    const optionHtml = `<option value="${item.value}">${item.text}</option>`;
-                                    $("#schoolTeacher").append(optionHtml);
-                                });
+                                $.each(resultData.text,
+                                    function(index, item) {
+                                        const optionHtml = `<option value="${item.value}">${item.text}</option>`;
+                                        $("#schoolTeacher").append(optionHtml);
+                                    });
                             }
                         }
                     });
                 }
             });
             $.getClass();
-            $("#schoolClasses").on("change", function() {
-                var classId = $(this).val();
-                $.getTeacher(classId);
+            $("#schoolClasses").on("change",
+                function() {
+                    var classId = $(this).val();
+                    $.getTeacher(classId);
+                });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $("#getData").click(function() {
+                $('#fillTable tbody').empty();
+                const selectedTeacherId = $("#schoolTeacher").val();
+
+                if (selectedTeacherId !== null) {
+                    const teacherId = selectedTeacherId;
+                    $.ajax({
+
+                        type: "post",
+                        url: "/Home/GetTeachersLectures",
+                        data: { "teacherId": teacherId },
+
+                        success: function(resultData) {
+                            if (resultData.length > 0) {
+                                $("#fillTable").prop("hidden", false);
+                                $.each(resultData, function(key, value) {
+                                    $('#fillTable').append(`<tr> <td>${value.student.name}</td>  <td>${value.lecture.date}</td> <td>${value.attended}</td> <td>${value.reasonAbsence}</td></tr>`);
+                                });
+                            } else {
+                                alert("No Data");
+                            }
+                        }
+                    });
+                }
             });
         });
     </script>

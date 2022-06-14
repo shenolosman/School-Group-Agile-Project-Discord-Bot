@@ -12,8 +12,8 @@ public class Lecture
     public Teacher? Teacher { get; set; }
 
     public Class Class { get; set; }
-
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<Student>? Students { get; set; }
-
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<Presence>? Presences { get; set; }
 }
