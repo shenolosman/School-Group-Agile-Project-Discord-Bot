@@ -2,29 +2,25 @@
 @inject PresenceHandler _presenceHandler
 @{
     ViewData["Title"] = "Home Page";
-    ViewData["Header-title"] = "Pr3s3nc3 Overview";
+    ViewData["Header-title"] = "Home Pr3s3nc3";
 }
 <br>
 
 <div class="d-flex ms-auto">
-    <h1 class="h1">
-        Home Pr3s3nc3
-    </h1>
-    <button class="btn btn-dark ms-auto mb-2 mb-lg-0">Export to Excel file</button>
-    <a asp-page="/Class/Lecture" asp-route-LectureId="1" class="page-link">Lecture 1 RazorPage</a>
+    <a asp-page="/Class/Lecture" asp-route-LectureId="1" class="btn btn-secondary ms-auto mb-lg-0">Test Overview</a>
 </div>
 
 <div class="col-md-6 d-flex">
-    <div class="col-md-6">
+    <div class="col-md-6 me-2">
         <div class="form-group">
-            <label>class</label>
+            <label>Class</label>
             <select class="form-control" name="classes" id="schoolClasses">
                 <option value="0">Select Class</option>
             </select>
         </div>
     </div>
     <div class="col-md-6">
-        <label>teacher</label>
+        <label>Teacher</label>
         <select class="form-control" name="teachers" id="schoolTeacher" disabled>
             <option value="0">Select Class First</option>
         </select>
