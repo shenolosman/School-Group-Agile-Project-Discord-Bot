@@ -83,7 +83,6 @@
         {
             @foreach (var item in Model.Presences)
             {
-                //var presence = presenceList.FirstOrDefault(p => p.Student == student);
                 <tr>
                     <td class="tdSize">@Html.DisplayFor(modelItem => item.Student.Name)</td>
                     <td class="tdSize">@Html.DisplayFor(modelItem => item.Lecture.Date)</td>
