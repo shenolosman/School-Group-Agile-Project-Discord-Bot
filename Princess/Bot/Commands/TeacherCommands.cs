@@ -3,7 +3,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
-using Princess.Bot.Services;
 using Princess.Models;
 using Princess.Services;
 
@@ -79,8 +78,6 @@ public class TeacherCommands : BaseCommandModule
         foreach (var user in allMembers)
             try
             {
-                var isStudent = false;
-
                 foreach (var role in user.Roles)
                     if (role.Name == "Student")
                         await user.SendMessageAsync(dmEmbed);
@@ -241,7 +238,6 @@ public class TeacherCommands : BaseCommandModule
                                         anyoneWhoReacted.Add(user);
                             }
             }
-
 
             var correctEmoji = string.Empty;
 

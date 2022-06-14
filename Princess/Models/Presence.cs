@@ -1,15 +1,14 @@
-﻿namespace Princess.Models
+﻿namespace Princess.Models;
+
+public class Presence
 {
-    public class Presence
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public bool Attended { get; set; }
+    public bool Attended { get; set; }
 
-        public string? ReasonAbsence { get; set; }
+    public string? ReasonAbsence { get; set; }
 
-        public Student Student { get; set; }
+    public Student Student { get; set; }
 
-        public Lecture Lecture { get; set; }
-    }
+    public Lecture Lecture { get; set; }
 }

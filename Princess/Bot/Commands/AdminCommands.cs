@@ -20,7 +20,6 @@ public class AdminCommands : BaseCommandModule
         {
             await using var scope = cmdCtx.Services.CreateAsyncScope();
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
-            //var classToAdd = await presenceHandler.GetClass(cmdCtx.Guild.Id);
             var classId = cmdCtx.Guild.Id;
             var teacherId = newTeacher.Id;
             var teacherName = newTeacher.Nickname ?? newTeacher.Username;

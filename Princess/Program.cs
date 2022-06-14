@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
-using Princess.Bot.Services;
 using Princess.Data;
 using Princess.Services;
 
