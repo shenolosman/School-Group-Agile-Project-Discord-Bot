@@ -59,7 +59,7 @@ public class LectureModel : PageModel
         IEnumerable<Presence> presencesList = lecture.Presences.ToList();
         if (!string.IsNullOrEmpty(searchString))
         {
-            presencesList = presencesList.Where(s => s.Student.Name.ToLower().Contains(searchString));
+            presencesList = presencesList.Where(s => s.Student.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase));
         }
         switch (sortOrder)
         {
