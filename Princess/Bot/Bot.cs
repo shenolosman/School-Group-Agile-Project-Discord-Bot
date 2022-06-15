@@ -189,7 +189,7 @@ public class Bot
                     {
                         Title = "Creation Of Teacher Role",
                         Description =
-                            "A Teacher Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Teacher Role has been created. For the bot to work as intended please use !RegisterTeacher when you want to add them to the role.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
@@ -235,7 +235,7 @@ public class Bot
                     {
                         Title = "Creation Of Student Role",
                         Description =
-                            "A Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Student Role has been created. The role will be distributed after a !presence command is used.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
