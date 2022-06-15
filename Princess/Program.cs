@@ -1,16 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Princess.Bot;
-using Princess.CSV;
 using Princess.Data;
 using Princess.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbService>();
 builder.Services.AddScoped<PresenceHandler>();
+builder.Services.AddScoped<TriviaQuestions>();
 
 builder.Services.AddDbContext<PresenceDbContext>(options =>
     options.UseSqlServer(
@@ -37,6 +41,8 @@ app.MapControllerRoute(
     "default",
     "{controller=Home}/{action=Index}/{id?}");
 
+app.MapRazorPages();
+
 using (var scope = app.Services.CreateScope())
 {
     var ctx = scope.ServiceProvider
@@ -49,7 +55,5 @@ using (var scope = app.Services.CreateScope())
 var bot = new Bot(app.Services);
 
 bot.RunAsync().GetAwaiter();
-
-var csvCreateFile = new CsvProgram();
 
 app.Run();

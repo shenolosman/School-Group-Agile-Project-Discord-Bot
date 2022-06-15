@@ -1,61 +1,108 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Princess.Models;
-using System.Diagnostics;
 using Princess.Services;
+using System.Data;
+using System.Diagnostics;
 
-namespace Princess.Controllers
+namespace Princess.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly PresenceHandler _presenceHandler;
+
+    public HomeController(ILogger<HomeController> logger, PresenceHandler presenceHandler)
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly PresenceHandler _presenceHandler;
-        public HomeController(ILogger<HomeController> logger, PresenceHandler presenceHandler)
+        _presenceHandler = presenceHandler;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<JsonResult> GetTeachersClass(string classId, string ddType) //ddType= dropdownType
+    {
+        var allClassList = await _presenceHandler.GetAllClasses();
+        var result = new List<SelectListItem>();
+        var isSucceed = true;
+        try
         {
-            _logger = logger;
-            _presenceHandler = presenceHandler;
+            switch (ddType)
+            {
+                case "getClass":
+                    foreach (var firstDropdown in allClassList)
+                        result.Add(new SelectListItem
+                        {
+                            Text = firstDropdown.Name,
+                            Value = firstDropdown.Id.ToString()
+                        });
+                    break;
+                case "getTeacher":
+                    foreach (var secondDropdown in allClassList.Where(x => x.Id == ulong.Parse(classId)))
+                        foreach (var item in secondDropdown.Teachers)
+                            result.Add(new SelectListItem
+                            {
+                                Text = item.Name,
+                                Value = item.Id.ToString()
+                            });
+                    break;
+            }
         }
-        private async Task<AttendanceView> GetAttendanceList(int currentPage)
+        catch (Exception)
         {
-            var maxRowsPerPage = 10;
-            var attendanceModel = new AttendanceView();
-
-            var getAttendanceList = await _presenceHandler.GetAllAttendees(DateTime.Today, "Win21", "Björn");
-
-            attendanceModel.AttendanceList = (from student in getAttendanceList select student)
-                .OrderBy(x => x.Student.Name)
-                .OrderByDescending(x => x.Lecture.Date)
-                .Skip((currentPage - 1) * maxRowsPerPage)
-                .Take(maxRowsPerPage)
-                .ToList();
-
-            var pageCount = (double)(getAttendanceList.Count / Convert.ToDecimal(maxRowsPerPage));
-            
-            attendanceModel.PageCount = (int)Math.Ceiling(pageCount); 
-            attendanceModel.CurrentPageIndex = currentPage; 
-            
-            return attendanceModel;
+            //if any error occurs
+            isSucceed = false;
+            result = new List<SelectListItem>();
+            result.Add(new SelectListItem
+            {
+                Text = "Got Issue",
+                Value = "Default"
+            });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Index() 
-         { 
-             return View(await GetAttendanceList(1));
-         }
-        [HttpPost]
-        public async Task<IActionResult> Index(int currentPageIndex)
+        return new JsonResult(new { ok = isSucceed, text = result });
+    }
+
+    [HttpPost]
+    public async Task<JsonResult> GetTeachersLectures(string teacherId)
+    {
+        var allClassList = await _presenceHandler.GetAllClasses();
+
+        var presencesList = new List<Presence>();
+        foreach (var classes in allClassList)
         {
-            return View(await GetAttendanceList(currentPageIndex));
+            foreach (var teacher in classes.Teachers.Where(x => x.Id == ulong.Parse(teacherId)))
+            {
+                foreach (var teacherLecture in teacher.Lectures)
+                {
+                    var lecture = await _presenceHandler.GetLecture(teacherLecture.Id);
+                    presencesList.AddRange(lecture.Presences);
+                }
+            }
         }
 
-        public IActionResult Privacy()
+        var todaysPresences = new List<Presence>();
+        //fetching only todays lectures
+        foreach (var presence in presencesList)
         {
-            return View();
+            if (presence.Lecture.Date.Day == DateTime.Now.Day)
+            {
+                todaysPresences.Add(presence);
+            }
         }
+        return Json(todaysPresences);
+    }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
