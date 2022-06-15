@@ -8,7 +8,7 @@ To add the bot to your server simply press the link below and
 pick the server in the dropdown menu. For the bot to work properly
 make sure that all the permissions are ticked before you add the bot.
 
-[Add bot to server](https://discord.com/api/oauth2/authorize?client_id=978574033845112852&permissions=2146958423&scope=bot%20applications.commands)
+[Add bot to server](https://discord.com/api/oauth2/authorize?client_id=978574033845112852&permissions=8&scope=bot%20applications.commands)
 
 
 ### After the bot joins
