@@ -9,8 +9,7 @@ public class Teacher
     public ulong Id { get; set; }
 
     public string Name { get; set; }
-
     public ICollection<Class>? Classes { get; set; }
-
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<Lecture>? Lectures { get; set; }
 }
