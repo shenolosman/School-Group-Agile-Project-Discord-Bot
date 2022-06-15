@@ -44,11 +44,6 @@ public class StudentCommands : BaseCommandModule
             var presenceHandler = scope.ServiceProvider.GetRequiredService<PresenceHandler>();
 
             await presenceHandler.RegisterAbsenceForStudent(studentId, classId, date, null, input);
-
-            await commandCtx.Channel.SendMessageAsync("Registered absence!" + " id: " +
-                                                          (commandCtx.Member.Nickname ?? commandCtx.Member.Username) +
-                                                          " ch: " +
-                                                          commandCtx.Guild.Name + " date: " + date);
         }
     }
 }
