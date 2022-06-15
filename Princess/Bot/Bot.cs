@@ -148,7 +148,7 @@ public class Bot
                     {
                         Title = "Creation of Roles",
                         Description =
-                            "A Teacher and Student Role has been created. For the bot to work as intended please use !RegisterTeacher and !RegisterStudent when you want to add them to the role.",
+                            "A Teacher and Student Role has been created.",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = sender.CurrentUser.AvatarUrl,
