@@ -40,5 +40,9 @@ After presence time finished teacher reacives a summary of lecture/class from th
 
 Students also sends absence notes before lecture and register them with spesific/private reason. And it can be via DM to the bot with !absence then reason.
 
+Teachers or authorized can see also result on the website and filter the spesific date also search by student name and export that as cvs file.
+
+![website](https://gcdnb.pbrd.co/images/zrTHFtgXJO1G.png?o=1 "website")
+### More...
 
 There is a [documantation](https://github.com/shenolosman/School-Group-Agile-Project-Discord-Bot/blob/main/Pr3s3nc3%20documentation.md?plain=1)  to for more information please check it out 
